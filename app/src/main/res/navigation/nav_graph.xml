@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.lifesaver.ui.home.HomeFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_detail"
+            app:destination="@id/groupDetailFragment" />
+
+        <action
+            android:id="@+id/action_home_to_add_edit_group"
+            app:destination="@id/addEditGroupFragment" />
+
+        <action
+            android:id="@+id/action_home_to_settings"
+            app:destination="@id/settingsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/groupDetailFragment"
+        android:name="com.lifesaver.ui.detail.GroupDetailFragment"
+        android:label="@string/group_detail"
+        tools:layout="@layout/fragment_group_detail">
+
+        <argument
+            android:name="groupId"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_detail_to_view"
+            app:destination="@id/viewPageFragment" />
+
+        <action
+            android:id="@+id/action_detail_to_add_edit_group"
+            app:destination="@id/addEditGroupFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/viewPageFragment"
+        android:name="com.lifesaver.ui.view.ViewPageFragment"
+        android:label="@string/view_page"
+        tools:layout="@layout/fragment_view_page">
+
+        <argument
+            android:name="groupId"
+            app:argType="string" />
+
+        <argument
+            android:name="pageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditGroupFragment"
+        android:name="com.lifesaver.ui.addedit.AddEditGroupFragment"
+        android:label="@string/add_edit_group"
+        tools:layout="@layout/fragment_add_edit_group">
+
+        <argument
+            android:name="groupId"
+            android:defaultValue=""
+            app:argType="string" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.lifesaver.ui.settings.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

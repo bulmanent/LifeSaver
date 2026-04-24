@@ -1,0 +1,143 @@
+package com.lifesaver.ui.home
+
+import android.os.Bundle
+import android.view.*
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.lifesaver.LifeSaverApplication
+import com.lifesaver.R
+import com.lifesaver.databinding.FragmentHomeBinding
+import com.lifesaver.model.GroupSummary
+
+class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: HomeViewModel by viewModels {
+        HomeViewModelFactory((requireActivity().application as LifeSaverApplication).repository)
+    }
+
+    private lateinit var adapter: GroupAdapter
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        setupMenu()
+        setupFab()
+        observeGroups()
+    }
+
+    private fun setupRecyclerView() {
+        adapter = GroupAdapter(
+            onItemClick = { summary ->
+                val action = HomeFragmentDirections.actionHomeToDetail(summary.id)
+                findNavController().navigate(action)
+            },
+            onItemLongClick = { summary ->
+                confirmDelete(summary)
+                true
+            }
+        )
+        binding.recyclerGroups.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerGroups.adapter = adapter
+
+        val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                val from = vh.adapterPosition
+                val to = target.adapterPosition
+                val list = adapter.currentList.toMutableList()
+                val moved = list.removeAt(from)
+                list.add(to, moved)
+                adapter.submitList(list)
+                return true
+            }
+
+            override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) {
+                val summary = adapter.currentList[vh.adapterPosition]
+                confirmDelete(summary)
+                adapter.notifyItemChanged(vh.adapterPosition)
+            }
+
+            override fun clearView(rv: RecyclerView, vh: RecyclerView.ViewHolder) {
+                super.clearView(rv, vh)
+                viewModel.reorderSummaries(adapter.currentList)
+            }
+        })
+        touchHelper.attachToRecyclerView(binding.recyclerGroups)
+    }
+
+    private fun setupMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+                inflater.inflate(R.menu.menu_home, menu)
+                val searchItem = menu.findItem(R.id.action_search)
+                val searchView = searchItem.actionView as SearchView
+                searchView.queryHint = getString(R.string.search_hint)
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?) = true
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        viewModel.setSearchQuery(newText ?: "")
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(item: MenuItem): Boolean {
+                return when (item.itemId) {
+                    R.id.action_settings -> {
+                        findNavController().navigate(R.id.action_home_to_settings)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun setupFab() {
+        binding.fabAddGroup.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_add_edit_group)
+        }
+    }
+
+    private fun observeGroups() {
+        viewModel.filteredGroups.observe(viewLifecycleOwner) { summaries ->
+            adapter.submitList(summaries)
+            binding.tvEmpty.visibility = if (summaries.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun confirmDelete(summary: GroupSummary) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_group_title)
+            .setMessage(getString(R.string.delete_group_message, summary.title))
+            .setPositiveButton(R.string.delete) { _, _ -> viewModel.deleteSummary(summary) }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
