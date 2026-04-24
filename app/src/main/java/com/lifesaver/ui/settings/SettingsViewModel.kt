@@ -1,57 +1,74 @@
 package com.lifesaver.ui.settings
 
-import android.content.Context
-import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.lifesaver.data.repository.DocumentRepository
-import com.lifesaver.util.JsonManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 sealed class SettingsEvent {
-    data class ExportReady(val json: String) : SettingsEvent()
-    data class ImportSuccess(val count: Int) : SettingsEvent()
-    data class Error(val message: String) : SettingsEvent()
+    data class Message(val message: String) : SettingsEvent()
 }
+
+data class SettingsUiState(
+    val accountEmail: String?,
+    val sheetsId: String,
+    val rootFolderId: String,
+    val canSync: Boolean
+)
 
 class SettingsViewModel(private val repository: DocumentRepository) : ViewModel() {
 
     private val _event = MutableLiveData<SettingsEvent>()
-    val event: LiveData<SettingsEvent> = _event
+    private val _uiState = MutableLiveData(buildState())
 
-    fun exportData() {
+    val event: LiveData<SettingsEvent> = _event
+    val uiState: LiveData<SettingsUiState> = _uiState
+
+    fun reloadState() {
+        _uiState.value = buildState()
+    }
+
+    fun saveConfig(sheetsId: String, rootFolderId: String) {
+        if (sheetsId.isBlank() || rootFolderId.isBlank()) {
+            _event.value = SettingsEvent.Message("Sheets ID and Drive folder ID are required")
+            return
+        }
+
         viewModelScope.launch {
-            try {
-                val groups = withContext(Dispatchers.IO) { repository.exportAll() }
-                val json = JsonManager.toJson(groups)
-                _event.value = SettingsEvent.ExportReady(json)
-            } catch (e: Exception) {
-                _event.value = SettingsEvent.Error(e.message ?: "Export failed")
+            runCatching {
+                repository.updateBackendConfig(sheetsId, rootFolderId)
+                _uiState.value = buildState()
+            }.onSuccess {
+                _event.value = SettingsEvent.Message("Configuration saved")
+            }.onFailure {
+                _event.value = SettingsEvent.Message(it.message ?: "Unable to save configuration")
             }
         }
     }
 
-    fun importFromUri(context: Context, uri: Uri, replaceAll: Boolean) {
+    fun syncNow() {
         viewModelScope.launch {
-            try {
-                val json = withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
-                        ?: throw Exception("Cannot read file")
-                }
-                val groups = JsonManager.fromJson(json)
-                withContext(Dispatchers.IO) {
-                    if (replaceAll) {
-                        repository.replaceAll(groups)
-                    } else {
-                        repository.mergeAll(groups)
-                    }
-                }
-                _event.value = SettingsEvent.ImportSuccess(groups.size)
-            } catch (e: Exception) {
-                _event.value = SettingsEvent.Error(e.message ?: "Import failed")
+            runCatching {
+                repository.refresh()
+                _uiState.value = buildState()
+            }.onSuccess {
+                _event.value = SettingsEvent.Message("Synced from Google Sheets")
+            }.onFailure {
+                _event.value = SettingsEvent.Message(it.message ?: "Sync failed")
             }
         }
+    }
+
+    private fun buildState(): SettingsUiState {
+        return SettingsUiState(
+            accountEmail = repository.currentAccountEmail(),
+            sheetsId = repository.currentSheetsId(),
+            rootFolderId = repository.currentRootFolderId(),
+            canSync = !repository.needsSetup()
+        )
     }
 }
 

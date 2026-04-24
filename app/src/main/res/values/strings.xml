@@ -4,6 +4,7 @@
 
     <!-- Home -->
     <string name="no_groups">No document groups yet.\nTap + to add one.</string>
+    <string name="setup_required_message">Complete Google setup first.\nYou will be redirected to Settings.</string>
     <string name="add_group">Add group</string>
     <string name="search_hint">Search by title or tag…</string>
     <string name="search">Search</string>
@@ -25,8 +26,6 @@
     <string name="page_counter">%1$d of %2$d</string>
     <string name="prev">← Prev</string>
     <string name="next">Next →</string>
-    <string name="remote_link_hint">This is a remote link (Google Photos / Drive).\nZoom and navigation are handled by the external app.</string>
-    <string name="open_in_app">Open in External App</string>
     <string name="document_image">Document image</string>
 
     <!-- Add/Edit Group -->
@@ -40,23 +39,27 @@
     <string name="title_required">Title is required</string>
 
     <!-- Page dialog -->
-    <string name="uri_hint">URI / Link (paste here or pick from device)</string>
     <string name="caption_hint">Caption (optional)</string>
     <string name="add">Add</string>
+    <string name="upload">Upload</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="pick_from_device">Pick from device</string>
+    <string name="capture_photo">Capture photo</string>
 
     <!-- Settings -->
-    <string name="backup_restore">Backup &amp; Restore</string>
-    <string name="export_data">Export to JSON</string>
-    <string name="import_data">Import from JSON</string>
-    <string name="export_via">Share backup via…</string>
-    <string name="import_strategy_title">Import strategy</string>
-    <string name="merge_strategy">Merge (skip duplicates by ID)</string>
-    <string name="replace_strategy">Replace All (overwrites existing data)</string>
-    <string name="replace_all_title">Replace All?</string>
-    <string name="replace_all_message">This will permanently delete all existing data and replace it with the imported file. Are you sure?</string>
-    <string name="replace">Replace All</string>
-    <string name="import_success">Imported %d group(s) successfully.</string>
-    <string name="version">Version %s</string>
+    <string name="google_setup">Google Setup</string>
+    <string name="google_setup_description">Sign in with your Google account, then enter the shared Google Sheets ID and the root Google Drive folder ID for LifeSaver.</string>
+    <string name="google_account">Connected Google account</string>
+    <string name="not_signed_in">Not signed in</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="sign_out_google">Sign out</string>
+    <string name="sheets_id_hint">Google Sheets ID</string>
+    <string name="root_folder_id_hint">Root Drive folder ID</string>
+    <string name="save_google_config">Save configuration</string>
+    <string name="sync_now">Sync now</string>
+    <string name="google_sign_in_success">Google account connected</string>
+    <string name="google_sign_in_failed">Google sign-in failed</string>
+    <string name="signed_out">Signed out</string>
+    <string name="google_setup_footer">LifeSaver reads Groups and Pages directly from Google Sheets and stores images directly in Google Drive. The sheet and folder must already exist and be shared with this Google account.</string>
 </resources>

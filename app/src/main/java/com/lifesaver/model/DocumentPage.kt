@@ -4,6 +4,8 @@ data class DocumentPage(
     val id: String,
     val groupId: String,
     val sequence: Int,
-    val uri: String,
-    val caption: String?
+    val driveFileId: String,
+    val caption: String?,
+    val mimeType: String? = null,
+    val fileName: String? = null
 )

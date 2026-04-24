@@ -1,8 +1,16 @@
 package com.lifesaver.ui.detail
 
+import android.net.Uri
 import android.os.Bundle
-import android.view.*
-import android.widget.EditText
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -14,10 +22,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
 import com.lifesaver.databinding.FragmentGroupDetailBinding
 import com.lifesaver.model.DocumentPage
+import java.io.File
 
 class GroupDetailFragment : Fragment() {
 
@@ -34,6 +44,17 @@ class GroupDetailFragment : Fragment() {
     }
 
     private lateinit var adapter: PageAdapter
+    private var pendingCameraUri: Uri? = null
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(::showCaptionDialog)
+    }
+
+    private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            pendingCameraUri?.let(::showCaptionDialog)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGroupDetailBinding.inflate(inflater, container, false)
@@ -47,15 +68,14 @@ class GroupDetailFragment : Fragment() {
         setupMenu()
         setupFab()
         observeData()
+        observeErrors()
+        viewModel.refresh()
     }
 
     private fun setupRecyclerView() {
         adapter = PageAdapter(
             onItemClick = { _, index ->
-                val action = GroupDetailFragmentDirections.actionDetailToView(
-                    args.groupId,
-                    index
-                )
+                val action = GroupDetailFragmentDirections.actionDetailToView(args.groupId, index)
                 findNavController().navigate(action)
             },
             onItemLongClick = { page ->
@@ -63,11 +83,13 @@ class GroupDetailFragment : Fragment() {
                 true
             }
         )
+
         binding.recyclerPages.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recyclerPages.adapter = adapter
 
         val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+            0
         ) {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
                 val from = vh.adapterPosition
@@ -79,7 +101,7 @@ class GroupDetailFragment : Fragment() {
                 return true
             }
 
-            override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) {}
+            override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) = Unit
 
             override fun clearView(rv: RecyclerView, vh: RecyclerView.ViewHolder) {
                 super.clearView(rv, vh)
@@ -103,6 +125,7 @@ class GroupDetailFragment : Fragment() {
                         findNavController().navigate(action)
                         true
                     }
+
                     else -> false
                 }
             }
@@ -111,24 +134,46 @@ class GroupDetailFragment : Fragment() {
 
     private fun setupFab() {
         binding.fabAddPage.setOnClickListener {
-            showAddPageDialog()
+            showImageSourceDialog()
         }
     }
 
-    private fun showAddPageDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_page, null)
-        val etUri = dialogView.findViewById<EditText>(R.id.etUri)
-        val etCaption = dialogView.findViewById<EditText>(R.id.etCaption)
+    private fun showImageSourceDialog() {
+        val options = arrayOf(
+            getString(R.string.pick_from_device),
+            getString(R.string.capture_photo)
+        )
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_page)
-            .setView(dialogView)
-            .setPositiveButton(R.string.add) { _, _ ->
-                val uri = etUri.text.toString().trim()
-                val caption = etCaption.text.toString().trim().ifBlank { null }
-                if (uri.isNotBlank()) {
-                    viewModel.addPage(uri, caption)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> pickImageLauncher.launch(arrayOf("image/*"))
+                    1 -> {
+                        val file = File(requireContext().cacheDir, "captured_${System.currentTimeMillis()}.jpg")
+                        pendingCameraUri = FileProvider.getUriForFile(
+                            requireContext(),
+                            "${requireContext().packageName}.fileprovider",
+                            file
+                        )
+                        takePhotoLauncher.launch(pendingCameraUri)
+                    }
                 }
+            }
+            .show()
+    }
+
+    private fun showCaptionDialog(uri: Uri) {
+        val input = TextInputEditText(requireContext()).apply {
+            hint = getString(R.string.caption_hint)
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.add_page)
+            .setView(input)
+            .setPositiveButton(R.string.upload) { _, _ ->
+                val caption = input.text?.toString()?.trim().takeUnless { it.isNullOrBlank() }
+                viewModel.addPage(uri, caption)
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
@@ -151,6 +196,15 @@ class GroupDetailFragment : Fragment() {
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             adapter.submitList(pages)
             binding.tvEmpty.visibility = if (pages.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun observeErrors() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                viewModel.consumeError()
+            }
         }
     }
 

@@ -1,167 +1,125 @@
 package com.lifesaver.data.repository
 
-import com.lifesaver.data.dao.DocumentGroupDao
-import com.lifesaver.data.dao.DocumentPageDao
-import com.lifesaver.data.entity.DocumentGroupEntity
-import com.lifesaver.data.entity.DocumentPageEntity
+import android.net.Uri
+import com.lifesaver.auth.GoogleAuthManager
+import com.lifesaver.data.preferences.AppPreferences
+import com.lifesaver.data.remote.GoogleSheetsDriveService
 import com.lifesaver.model.DocumentGroup
 import com.lifesaver.model.DocumentPage
 import com.lifesaver.model.GroupSummary
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import java.util.UUID
 
 class DocumentRepository(
-    private val groupDao: DocumentGroupDao,
-    private val pageDao: DocumentPageDao
+    private val authManager: GoogleAuthManager,
+    private val preferences: AppPreferences,
+    private val remoteService: GoogleSheetsDriveService
 ) {
 
-    val allGroups: Flow<List<DocumentGroup>> = groupDao.getAllGroups().map { entities ->
-        entities.map { it.toDomain() }
-    }
+    private val groupsState = MutableStateFlow<List<DocumentGroup>>(emptyList())
+
+    val allGroups: Flow<List<DocumentGroup>> = groupsState
 
     val allGroupSummaries: Flow<List<GroupSummary>> =
-        groupDao.getAllGroupsWithCount().map { list ->
-            list.map { gwc ->
-                GroupSummary(
-                    id = gwc.group.id,
-                    title = gwc.group.title,
-                    sequence = gwc.group.sequence,
-                    tags = if (gwc.group.tags.isBlank()) emptyList()
-                           else gwc.group.tags.split(",").map { it.trim() },
-                    description = gwc.group.description,
-                    pageCount = gwc.pageCount
-                )
-            }
+        groupsState.map { groups ->
+            groups
+                .sortedBy { it.sequence }
+                .map { group ->
+                    GroupSummary(
+                        id = group.id,
+                        title = group.title,
+                        sequence = group.sequence,
+                        tags = group.tags,
+                        description = group.description,
+                        pageCount = group.pages.size
+                    )
+                }
         }
 
     fun getPagesForGroup(groupId: String): Flow<List<DocumentPage>> =
-        pageDao.getPagesForGroup(groupId).map { entities ->
-            entities.map { it.toDomain() }
+        groupsState.map { groups ->
+            groups.firstOrNull { it.id == groupId }
+                ?.pages
+                ?.sortedBy { it.sequence }
+                ?: emptyList()
         }
 
-    fun getPageCountForGroup(groupId: String): Flow<Int> =
-        pageDao.getPageCountForGroup(groupId)
+    fun isConfigured(): Boolean = preferences.isBackendConfigured()
 
-    suspend fun getGroupById(id: String): DocumentGroup? =
-        groupDao.getGroupById(id)?.toDomain()
+    fun isSignedIn(): Boolean = authManager.isSignedInWithRequiredScopes()
 
-    suspend fun getPageById(id: String): DocumentPage? =
-        pageDao.getPageById(id)?.toDomain()
+    fun needsSetup(): Boolean = !isSignedIn() || !isConfigured()
 
-    suspend fun getPagesForGroupOnce(groupId: String): List<DocumentPage> =
-        pageDao.getPagesForGroupOnce(groupId).map { it.toDomain() }
+    fun currentAccountEmail(): String? = authManager.currentEmail()
+
+    fun currentSheetsId(): String = preferences.sheetsId.orEmpty()
+
+    fun currentRootFolderId(): String = preferences.rootFolderId.orEmpty()
+
+    suspend fun refresh() {
+        if (needsSetup()) {
+            groupsState.value = emptyList()
+            return
+        }
+        groupsState.value = remoteService.fetchAll()
+    }
+
+    suspend fun getGroupById(id: String): DocumentGroup? {
+        if (groupsState.value.isEmpty() && !needsSetup()) {
+            refresh()
+        }
+        return groupsState.value.firstOrNull { it.id == id }
+    }
+
+    suspend fun getPageById(id: String): DocumentPage? {
+        if (groupsState.value.isEmpty() && !needsSetup()) {
+            refresh()
+        }
+        return groupsState.value
+            .flatMap { it.pages }
+            .firstOrNull { it.id == id }
+    }
 
     suspend fun addGroup(title: String, tags: List<String>, description: String?): DocumentGroup {
-        val maxSeq = groupDao.getMaxSequence() ?: -1
-        val entity = DocumentGroupEntity(
-            id = UUID.randomUUID().toString(),
-            title = title,
-            sequence = maxSeq + 1,
-            tags = tags.joinToString(","),
-            description = description
-        )
-        groupDao.insertGroup(entity)
-        return entity.toDomain()
+        val group = remoteService.addGroup(title, tags, description)
+        refresh()
+        return group
     }
 
     suspend fun updateGroup(group: DocumentGroup) {
-        groupDao.updateGroup(group.toEntity())
+        remoteService.updateGroup(group)
+        refresh()
     }
 
     suspend fun deleteGroup(group: DocumentGroup) {
-        groupDao.deleteGroup(group.toEntity())
+        remoteService.deleteGroup(group)
+        refresh()
     }
 
     suspend fun reorderGroups(groups: List<DocumentGroup>) {
-        val updated = groups.mapIndexed { index, group ->
-            group.copy(sequence = index).toEntity()
-        }
-        groupDao.insertGroups(updated)
+        remoteService.reorderGroups(groups)
+        refresh()
     }
 
-    suspend fun addPage(groupId: String, uri: String, caption: String?): DocumentPage {
-        val maxSeq = pageDao.getMaxSequenceForGroup(groupId) ?: -1
-        val entity = DocumentPageEntity(
-            id = UUID.randomUUID().toString(),
-            groupId = groupId,
-            sequence = maxSeq + 1,
-            uri = uri,
-            caption = caption
-        )
-        pageDao.insertPage(entity)
-        return entity.toDomain()
-    }
-
-    suspend fun updatePage(page: DocumentPage) {
-        pageDao.updatePage(page.toEntity())
+    suspend fun addPage(groupId: String, localUri: Uri, caption: String?): DocumentPage {
+        val page = remoteService.addPage(groupId, localUri, caption)
+        refresh()
+        return page
     }
 
     suspend fun deletePage(page: DocumentPage) {
-        pageDao.deletePage(page.toEntity())
+        remoteService.deletePage(page)
+        refresh()
     }
 
-    suspend fun reorderPages(pages: List<DocumentPage>) {
-        val updated = pages.mapIndexed { index, page ->
-            page.copy(sequence = index).toEntity()
-        }
-        pageDao.insertPages(updated)
+    suspend fun reorderPages(groupId: String, pages: List<DocumentPage>) {
+        remoteService.reorderPages(groupId, pages)
+        refresh()
     }
 
-    suspend fun replaceAll(groups: List<DocumentGroup>) {
-        pageDao.deleteAllPages()
-        groupDao.deleteAllGroups()
-        val groupEntities = groups.map { it.toEntity() }
-        groupDao.insertGroups(groupEntities)
-        val pageEntities = groups.flatMap { g -> g.pages.map { it.toEntity() } }
-        pageDao.insertPages(pageEntities)
-    }
-
-    suspend fun mergeAll(groups: List<DocumentGroup>) {
-        val groupEntities = groups.map { it.toEntity() }
-        groupDao.insertGroups(groupEntities)
-        val pageEntities = groups.flatMap { g -> g.pages.map { it.toEntity() } }
-        pageDao.insertPages(pageEntities)
-    }
-
-    suspend fun exportAll(): List<DocumentGroup> {
-        val groupEntities = groupDao.getAllGroupsOnce()
-        return groupEntities.map { ge ->
-            val pages = pageDao.getPagesForGroupOnce(ge.id).map { it.toDomain() }
-            ge.toDomain().copy(pages = pages)
-        }
+    suspend fun updateBackendConfig(sheetsId: String, rootFolderId: String) {
+        preferences.saveBackendConfig(sheetsId, rootFolderId)
+        refresh()
     }
 }
-
-private fun DocumentGroupEntity.toDomain() = DocumentGroup(
-    id = id,
-    title = title,
-    sequence = sequence,
-    tags = if (tags.isBlank()) emptyList() else tags.split(",").map { it.trim() },
-    description = description,
-    pages = emptyList()
-)
-
-private fun DocumentPageEntity.toDomain() = DocumentPage(
-    id = id,
-    groupId = groupId,
-    sequence = sequence,
-    uri = uri,
-    caption = caption
-)
-
-private fun DocumentGroup.toEntity() = DocumentGroupEntity(
-    id = id,
-    title = title,
-    sequence = sequence,
-    tags = tags.joinToString(","),
-    description = description
-)
-
-private fun DocumentPage.toEntity() = DocumentPageEntity(
-    id = id,
-    groupId = groupId,
-    sequence = sequence,
-    uri = uri,
-    caption = caption
-)

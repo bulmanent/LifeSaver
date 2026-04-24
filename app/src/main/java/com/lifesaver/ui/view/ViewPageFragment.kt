@@ -1,15 +1,16 @@
 package com.lifesaver.ui.view
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.github.chrisbanes.photoview.PhotoView
+import com.bumptech.glide.Glide
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
+import com.lifesaver.data.remote.DriveImageRef
 import com.lifesaver.databinding.FragmentViewPageBinding
 import com.lifesaver.model.DocumentPage
 
@@ -41,17 +42,17 @@ class ViewPageFragment : Fragment() {
         binding.btnNext.setOnClickListener { viewModel.goNext() }
 
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
-            val index = viewModel.currentIndex.value ?: 0
-            updateNavButtons(index, pages.size)
+            updateNavButtons(viewModel.currentIndex.value ?: 0, pages.size)
         }
 
         viewModel.currentIndex.observe(viewLifecycleOwner) { index ->
-            val size = viewModel.pages.value?.size ?: 0
-            updateNavButtons(index, size)
+            updateNavButtons(index, viewModel.pages.value?.size ?: 0)
         }
 
         viewModel.currentPage.observe(viewLifecycleOwner) { page ->
-            if (page != null) displayPage(page)
+            if (page != null) {
+                displayPage(page)
+            }
         }
     }
 
@@ -61,27 +62,10 @@ class ViewPageFragment : Fragment() {
         binding.tvPageCounter.text = getString(R.string.page_counter, index + 1, total)
         binding.tvCaption.text = page.caption ?: ""
 
-        val uri = Uri.parse(page.uri)
-        val isLocal = uri.scheme == "content" || uri.scheme == "file"
-
-        if (isLocal) {
-            binding.photoView.visibility = View.VISIBLE
-            binding.tvRemoteHint.visibility = View.GONE
-            binding.btnOpenExternal.visibility = View.GONE
-            try {
-                binding.photoView.setImageURI(uri)
-            } catch (e: Exception) {
-                binding.photoView.setImageResource(android.R.drawable.ic_menu_report_image)
-            }
-        } else {
-            binding.photoView.visibility = View.GONE
-            binding.tvRemoteHint.visibility = View.VISIBLE
-            binding.btnOpenExternal.visibility = View.VISIBLE
-            binding.btnOpenExternal.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(intent)
-            }
-        }
+        Glide.with(this)
+            .load(DriveImageRef(page.driveFileId))
+            .error(android.R.drawable.ic_menu_report_image)
+            .into(binding.photoView)
     }
 
     private fun updateNavButtons(index: Int, size: Int) {

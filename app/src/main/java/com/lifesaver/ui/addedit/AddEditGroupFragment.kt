@@ -1,8 +1,11 @@
 package com.lifesaver.ui.addedit
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -39,6 +42,7 @@ class AddEditGroupFragment : Fragment() {
         setupTagInput()
         setupSaveButton()
         observeExistingGroup()
+        observeErrors()
     }
 
     private fun setupTagInput() {
@@ -46,7 +50,9 @@ class AddEditGroupFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 addTagFromInput()
                 true
-            } else false
+            } else {
+                false
+            }
         }
         binding.btnAddTag.setOnClickListener { addTagFromInput() }
     }
@@ -98,6 +104,15 @@ class AddEditGroupFragment : Fragment() {
                 currentTags.addAll(group.tags)
                 binding.chipGroupTags.removeAllViews()
                 group.tags.forEach { addChip(it) }
+            }
+        }
+    }
+
+    private fun observeErrors() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                viewModel.consumeError()
             }
         }
     }

@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/item_document_group.xml",
+        "source": "com.lifesaver.app-main-55:/layout/item_document_group.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/activity_main.xml",
+        "source": "com.lifesaver.app-main-55:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_settings.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_view_page.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_view_page.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_group_detail.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_group_detail.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/item_document_page.xml",
+        "source": "com.lifesaver.app-main-55:/layout/item_document_page.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_add_edit_group.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_add_edit_group.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/dialog_add_page.xml",
+        "source": "com.lifesaver.app-main-55:/layout/dialog_add_page.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_home.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_home.xml"
+    }
+]

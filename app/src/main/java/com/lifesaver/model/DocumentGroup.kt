@@ -6,5 +6,6 @@ data class DocumentGroup(
     val sequence: Int,
     val tags: List<String>,
     val description: String?,
+    val driveFolderId: String? = null,
     val pages: List<DocumentPage> = emptyList()
 )

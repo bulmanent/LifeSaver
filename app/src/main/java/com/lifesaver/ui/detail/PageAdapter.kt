@@ -1,11 +1,12 @@
 package com.lifesaver.ui.detail
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.lifesaver.data.remote.DriveImageRef
 import com.lifesaver.databinding.ItemDocumentPageBinding
 import com.lifesaver.model.DocumentPage
 
@@ -18,20 +19,15 @@ class PageAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(page: DocumentPage, position: Int) {
-            val seqLabel = "${position + 1}"
-            binding.tvPageSequence.text = seqLabel
+            binding.tvPageSequence.text = "${position + 1}"
             binding.tvCaption.text = page.caption ?: ""
 
-            try {
-                val uri = Uri.parse(page.uri)
-                if (uri.scheme == "content" || uri.scheme == "file") {
-                    binding.ivPageThumb.setImageURI(uri)
-                } else {
-                    binding.ivPageThumb.setImageResource(android.R.drawable.ic_menu_gallery)
-                }
-            } catch (e: Exception) {
-                binding.ivPageThumb.setImageResource(android.R.drawable.ic_menu_gallery)
-            }
+            Glide.with(binding.ivPageThumb)
+                .load(DriveImageRef(page.driveFileId))
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.ic_menu_report_image)
+                .centerCrop()
+                .into(binding.ivPageThumb)
 
             binding.root.setOnClickListener { onItemClick(page, position) }
             binding.root.setOnLongClickListener { onItemLongClick(page) }
@@ -40,7 +36,9 @@ class PageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder {
         val binding = ItemDocumentPageBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
         return PageViewHolder(binding)
     }

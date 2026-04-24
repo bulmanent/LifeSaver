@@ -17,6 +17,7 @@ data class GroupExport(
     val sequence: Int,
     val tags: List<String>,
     val description: String?,
+    val driveFolderId: String?,
     val pages: List<PageExport>
 )
 
@@ -24,8 +25,10 @@ data class PageExport(
     val id: String,
     val groupId: String,
     val sequence: Int,
-    val uri: String,
-    val caption: String?
+    val driveFileId: String,
+    val caption: String?,
+    val mimeType: String?,
+    val fileName: String?
 )
 
 object JsonManager {
@@ -40,13 +43,16 @@ object JsonManager {
                 sequence = group.sequence,
                 tags = group.tags,
                 description = group.description,
+                driveFolderId = group.driveFolderId,
                 pages = group.pages.map { page ->
                     PageExport(
                         id = page.id,
                         groupId = page.groupId,
                         sequence = page.sequence,
-                        uri = page.uri,
-                        caption = page.caption
+                        driveFileId = page.driveFileId,
+                        caption = page.caption,
+                        mimeType = page.mimeType,
+                        fileName = page.fileName
                     )
                 }
             )
@@ -64,13 +70,16 @@ object JsonManager {
                 sequence = ge.sequence,
                 tags = ge.tags,
                 description = ge.description,
+                driveFolderId = ge.driveFolderId,
                 pages = ge.pages.map { pe ->
                     DocumentPage(
                         id = pe.id,
                         groupId = pe.groupId,
                         sequence = pe.sequence,
-                        uri = pe.uri,
-                        caption = pe.caption
+                        driveFileId = pe.driveFileId,
+                        caption = pe.caption,
+                        mimeType = pe.mimeType,
+                        fileName = pe.fileName
                     )
                 }
             )

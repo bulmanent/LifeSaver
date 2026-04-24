@@ -1,13 +1,20 @@
 package com.lifesaver.ui.home
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,6 +48,27 @@ class HomeFragment : Fragment() {
         setupMenu()
         setupFab()
         observeGroups()
+        observeErrors()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.needsSetup()) {
+            binding.fabAddGroup.hide()
+            binding.recyclerGroups.visibility = View.GONE
+            binding.tvEmpty.visibility = View.VISIBLE
+            binding.tvEmpty.text = getString(R.string.setup_required_message)
+            viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+                if (findNavController().currentDestination?.id == R.id.homeFragment) {
+                    findNavController().navigate(R.id.action_home_to_settings)
+                }
+            }
+        } else {
+            binding.fabAddGroup.show()
+            binding.recyclerGroups.visibility = View.VISIBLE
+            binding.tvEmpty.text = getString(R.string.no_groups)
+            viewModel.refresh()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -95,6 +123,7 @@ class HomeFragment : Fragment() {
                 searchView.queryHint = getString(R.string.search_hint)
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?) = true
+
                     override fun onQueryTextChange(newText: String?): Boolean {
                         viewModel.setSearchQuery(newText ?: "")
                         return true
@@ -124,6 +153,15 @@ class HomeFragment : Fragment() {
         viewModel.filteredGroups.observe(viewLifecycleOwner) { summaries ->
             adapter.submitList(summaries)
             binding.tvEmpty.visibility = if (summaries.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun observeErrors() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                viewModel.consumeError()
+            }
         }
     }
 

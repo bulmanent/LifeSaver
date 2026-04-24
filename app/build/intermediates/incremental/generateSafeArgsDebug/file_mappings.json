@@ -1,0 +1,1 @@
+[{"navFile":"src/main/res/navigation/nav_graph.xml","javaFiles":["com.lifesaver.ui.home.HomeFragmentDirections","com.lifesaver.ui.detail.GroupDetailFragmentDirections","com.lifesaver.ui.detail.GroupDetailFragmentArgs","com.lifesaver.ui.view.ViewPageFragmentArgs","com.lifesaver.ui.addedit.AddEditGroupFragmentArgs"]}]
