@@ -22,6 +22,7 @@ color purple_700
 color teal_200
 color teal_700
 color white
+id action_addEditGroup_to_detail
 id action_detail_to_add_edit_group
 id action_detail_to_view
 id action_edit_group
@@ -33,9 +34,11 @@ id action_settings
 id addEditGroupFragment
 id bottomBar
 id btnAddTag
+id btnEdit
 id btnNext
 id btnPrev
 id btnSave
+id btnSaveAndAddItems
 id btnSaveConfig
 id btnSignIn
 id btnSignOut
@@ -120,9 +123,11 @@ string pick_from_device
 string prev
 string root_folder_id_hint
 string save
+string save_and_add_items
 string save_google_config
 string search
 string search_hint
+string sequence_hint
 string settings
 string setup_required_message
 string sheets_id_hint

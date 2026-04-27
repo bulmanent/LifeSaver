@@ -2221,6 +2221,7 @@
     <string name="prev">← Prev</string>
     <string name="root_folder_id_hint">Root Drive folder ID</string>
     <string name="save">Save</string>
+    <string name="save_and_add_items">Save and add items</string>
     <string name="save_google_config">Save configuration</string>
     <string name="search">Search</string>
     <string name="search_hint">Search by title or tag…</string>
@@ -2230,6 +2231,7 @@
   </string>
     <string description="Content description for the X button to clear text [CHAR_LIMIT=NONE]" name="searchview_clear_text_content_description">Clear text</string>
     <string description="Content description for the navigation button to return to the previous screen [CHAR_LIMIT=NONE]" name="searchview_navigation_content_description">Back</string>
+    <string name="sequence_hint">Sequence</string>
     <string name="settings">Settings</string>
     <string name="setup_required_message">Complete Google setup first.\nYou will be redirected to Settings.</string>
     <string name="sheets_id_hint">Google Sheets ID</string>

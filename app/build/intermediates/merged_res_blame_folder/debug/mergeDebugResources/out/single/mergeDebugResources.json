@@ -1,5 +1,9 @@
 [
     {
+        "merged": "com.lifesaver.app-debug-53:/layout_fragment_add_edit_group.xml.flat",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_add_edit_group.xml"
+    },
+    {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/xml_file_paths.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/xml/file_paths.xml"
     },
@@ -20,16 +24,16 @@
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/navigation_nav_graph.xml.flat",
-        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/navigation/nav_graph.xml"
+        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_group.xml.flat",
+        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_group.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_page.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_page.xml"
     },
     {
-        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_group.xml.flat",
-        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_group.xml"
+        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/navigation_nav_graph.xml.flat",
+        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/navigation/nav_graph.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/mipmap-xxxhdpi_ic_launcher.png.flat",
@@ -66,6 +70,10 @@
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/menu_menu_home.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/menu/menu_home.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-debug-53:/navigation_nav_graph.xml.flat",
+        "source": "com.lifesaver.app-main-55:/navigation/nav_graph.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/mipmap-hdpi_ic_launcher_round.png.flat",

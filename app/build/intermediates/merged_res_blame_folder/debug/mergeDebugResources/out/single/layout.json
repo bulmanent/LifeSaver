@@ -28,6 +28,10 @@
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_group.xml"
     },
     {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_add_edit_group.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_add_edit_group.xml"
+    },
+    {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-mergeDebugResources-52:/layout/fragment_view_page.xml",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/fragment_view_page.xml"
     },

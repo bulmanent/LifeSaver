@@ -29,6 +29,9 @@ public final class FragmentAddEditGroupBinding implements ViewBinding {
   public final MaterialButton btnSave;
 
   @NonNull
+  public final MaterialButton btnSaveAndAddItems;
+
+  @NonNull
   public final ChipGroup chipGroupTags;
 
   @NonNull
@@ -45,12 +48,13 @@ public final class FragmentAddEditGroupBinding implements ViewBinding {
 
   private FragmentAddEditGroupBinding(@NonNull ScrollView rootView,
       @NonNull MaterialButton btnAddTag, @NonNull MaterialButton btnSave,
-      @NonNull ChipGroup chipGroupTags, @NonNull TextInputEditText etDescription,
-      @NonNull TextInputEditText etTagInput, @NonNull TextInputEditText etTitle,
-      @NonNull TextInputLayout tilTitle) {
+      @NonNull MaterialButton btnSaveAndAddItems, @NonNull ChipGroup chipGroupTags,
+      @NonNull TextInputEditText etDescription, @NonNull TextInputEditText etTagInput,
+      @NonNull TextInputEditText etTitle, @NonNull TextInputLayout tilTitle) {
     this.rootView = rootView;
     this.btnAddTag = btnAddTag;
     this.btnSave = btnSave;
+    this.btnSaveAndAddItems = btnSaveAndAddItems;
     this.chipGroupTags = chipGroupTags;
     this.etDescription = etDescription;
     this.etTagInput = etTagInput;
@@ -97,6 +101,12 @@ public final class FragmentAddEditGroupBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnSaveAndAddItems;
+      MaterialButton btnSaveAndAddItems = ViewBindings.findChildViewById(rootView, id);
+      if (btnSaveAndAddItems == null) {
+        break missingId;
+      }
+
       id = R.id.chipGroupTags;
       ChipGroup chipGroupTags = ViewBindings.findChildViewById(rootView, id);
       if (chipGroupTags == null) {
@@ -128,7 +138,7 @@ public final class FragmentAddEditGroupBinding implements ViewBinding {
       }
 
       return new FragmentAddEditGroupBinding((ScrollView) rootView, btnAddTag, btnSave,
-          chipGroupTags, etDescription, etTagInput, etTitle, tilTitle);
+          btnSaveAndAddItems, chipGroupTags, etDescription, etTagInput, etTitle, tilTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

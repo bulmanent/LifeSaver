@@ -16,6 +16,7 @@
     <string name="group_detail">Group Detail</string>
     <string name="no_pages">No pages yet.\nTap + to add one.</string>
     <string name="add_page">Add page</string>
+    <string name="edit">Edit</string>
     <string name="edit_group">Edit</string>
     <string name="delete_page_title">Delete page?</string>
     <string name="delete_page_message">Delete this page? This cannot be undone.</string>
