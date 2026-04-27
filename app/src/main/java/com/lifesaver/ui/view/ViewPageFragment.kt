@@ -4,10 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
 import com.lifesaver.data.remote.DriveImageRef
@@ -40,6 +45,9 @@ class ViewPageFragment : Fragment() {
 
         binding.btnPrev.setOnClickListener { viewModel.goPrev() }
         binding.btnNext.setOnClickListener { viewModel.goNext() }
+        binding.btnEdit.setOnClickListener {
+            viewModel.currentPage.value?.let(::showEditDialog)
+        }
 
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             updateNavButtons(viewModel.currentIndex.value ?: 0, pages.size)
@@ -52,6 +60,13 @@ class ViewPageFragment : Fragment() {
         viewModel.currentPage.observe(viewLifecycleOwner) { page ->
             if (page != null) {
                 displayPage(page)
+            }
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                viewModel.consumeError()
             }
         }
     }
@@ -79,6 +94,66 @@ class ViewPageFragment : Fragment() {
     private fun updateNavButtons(index: Int, size: Int) {
         binding.btnPrev.isEnabled = index > 0
         binding.btnNext.isEnabled = index < size - 1
+    }
+
+    private fun showEditDialog(page: DocumentPage) {
+        val sequenceLayout = TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.sequence_hint)
+            addView(
+                TextInputEditText(context).apply {
+                    inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                    setText(page.sequence.toString())
+                }
+            )
+        }
+
+        val captionLayout = TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.caption_hint)
+            addView(
+                TextInputEditText(context).apply {
+                    setText(page.caption.orEmpty())
+                }
+            )
+        }
+
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 24, 48, 0)
+            addView(sequenceLayout)
+            addView(captionLayout)
+        }
+
+        var textLayout: TextInputLayout? = null
+        if (page.isTextOnly) {
+            textLayout = TextInputLayout(requireContext()).apply {
+                hint = getString(R.string.text_entry_hint)
+                addView(
+                    TextInputEditText(context).apply {
+                        minLines = 4
+                        setText(page.textContent.orEmpty())
+                    }
+                )
+            }
+            container.addView(textLayout)
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.edit)
+            .setView(container)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val updated = page.copy(
+                    sequence = sequenceLayout.editText?.text?.toString()?.trim()?.toIntOrNull() ?: page.sequence,
+                    caption = captionLayout.editText?.text?.toString()?.trim().takeUnless { it.isNullOrBlank() },
+                    textContent = if (page.isTextOnly) {
+                        textLayout?.editText?.text?.toString()?.trim().takeUnless { it.isNullOrBlank() }
+                    } else {
+                        page.textContent
+                    }
+                )
+                viewModel.updatePage(updated)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     override fun onDestroyView() {

@@ -50,16 +50,16 @@ class GroupDetailViewModel(
         }
     }
 
-    fun addPage(uri: Uri, caption: String?) {
+    fun addPage(uri: Uri, caption: String?, sequence: Int?) {
         viewModelScope.launch {
-            runCatching { repository.addPage(groupId, uri, caption) }
+            runCatching { repository.addPage(groupId, uri, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to upload image" }
         }
     }
 
-    fun addTextPage(textContent: String, caption: String?) {
+    fun addTextPage(textContent: String, caption: String?, sequence: Int?) {
         viewModelScope.launch {
-            runCatching { repository.addTextPage(groupId, textContent, caption) }
+            runCatching { repository.addTextPage(groupId, textContent, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to save text entry" }
         }
     }

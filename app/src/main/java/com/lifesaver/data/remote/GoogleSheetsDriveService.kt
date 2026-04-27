@@ -123,7 +123,7 @@ class GoogleSheetsDriveService(
         }
     }
 
-    suspend fun addPage(groupId: String, localUri: Uri, caption: String?): DocumentPage =
+    suspend fun addPage(groupId: String, localUri: Uri, caption: String?, sequence: Int? = null): DocumentPage =
         withContext(Dispatchers.IO) {
             ensureReady()
             ensureSheetsStructure()
@@ -148,11 +148,11 @@ class GoogleSheetsDriveService(
                 )
             }
 
-            val sequence = groups.firstOrNull { it.id == groupId }?.pages?.maxOfOrNull { it.sequence }?.plus(1) ?: 0
+            val nextSequence = groups.firstOrNull { it.id == groupId }?.pages?.maxOfOrNull { it.sequence }?.plus(1) ?: 0
             val page = DocumentPage(
                 id = UUID.randomUUID().toString(),
                 groupId = groupId,
-                sequence = sequence,
+                sequence = sequence ?: nextSequence,
                 driveFileId = upload.id,
                 caption = caption?.trim()?.takeIf { it.isNotEmpty() },
                 itemType = DocumentPage.TYPE_IMAGE,
@@ -164,19 +164,19 @@ class GoogleSheetsDriveService(
             page
         }
 
-    suspend fun addTextPage(groupId: String, textContent: String, caption: String?): DocumentPage =
+    suspend fun addTextPage(groupId: String, textContent: String, caption: String?, sequence: Int? = null): DocumentPage =
         withContext(Dispatchers.IO) {
             ensureReady()
             ensureSheetsStructure()
 
             val groups = fetchAll()
             val group = groups.firstOrNull { it.id == groupId } ?: error("Group not found")
-            val sequence = group.pages.maxOfOrNull { it.sequence }?.plus(1) ?: 0
+            val nextSequence = group.pages.maxOfOrNull { it.sequence }?.plus(1) ?: 0
 
             val page = DocumentPage(
                 id = UUID.randomUUID().toString(),
                 groupId = groupId,
-                sequence = sequence,
+                sequence = sequence ?: nextSequence,
                 driveFileId = null,
                 caption = caption?.trim()?.takeIf { it.isNotEmpty() },
                 itemType = DocumentPage.TYPE_TEXT,
@@ -197,6 +197,14 @@ class GoogleSheetsDriveService(
         deleteRow(PAGES_SHEET, row.rowNumber)
     }
 
+    suspend fun updatePage(page: DocumentPage) = withContext(Dispatchers.IO) {
+        ensureReady()
+        ensureSheetsStructure()
+
+        val row = findRowById(PAGES_SHEET, page.id, PAGES_COLUMNS.size) ?: error("Page not found")
+        updateRow(PAGES_SHEET, row.rowNumber, page.toRow())
+    }
+
     suspend fun reorderPages(groupId: String, pages: List<DocumentPage>) = withContext(Dispatchers.IO) {
         ensureReady()
         ensureSheetsStructure()
@@ -214,9 +222,11 @@ class GoogleSheetsDriveService(
     fun openDriveFileStream(fileId: String): InputStream {
         ensureReadySync()
         require(fileId.isNotBlank()) { "Missing Drive file ID" }
-        val response = requestFactory()
-            .buildGetRequest(GenericUrl("${DRIVE_FILES_URL}/${fileId}?alt=media"))
-            .execute()
+        val response = executeWithRetry {
+            requestFactory()
+                .buildGetRequest(GenericUrl("${DRIVE_FILES_URL}/${fileId}?alt=media"))
+                .execute()
+        }
         val bytes = response.content.readBytes()
         response.disconnect()
         return ByteArrayInputStream(bytes)
@@ -359,7 +369,9 @@ class GoogleSheetsDriveService(
 
     private fun deleteDriveFile(fileId: String) {
         try {
-            requestFactory().buildDeleteRequest(GenericUrl("$DRIVE_FILES_URL/$fileId")).execute().disconnect()
+            executeWithRetry {
+                requestFactory().buildDeleteRequest(GenericUrl("$DRIVE_FILES_URL/$fileId")).execute()
+            }.disconnect()
         } catch (_: HttpResponseException) {
         }
     }
@@ -405,12 +417,14 @@ class GoogleSheetsDriveService(
             append("Content-Type: ").append(mimeType).append("\r\n\r\n")
         }.toByteArray() + fileBytes + "\r\n--$boundary--\r\n".toByteArray()
 
-        val response = requestFactory()
-            .buildPostRequest(
-                GenericUrl("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType"),
-                ByteArrayContent("multipart/related; boundary=$boundary", body)
-            )
-            .execute()
+        val response = executeWithRetry {
+            requestFactory()
+                .buildPostRequest(
+                    GenericUrl("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType"),
+                    ByteArrayContent("multipart/related; boundary=$boundary", body)
+                )
+                .execute()
+        }
         val responseBody = response.parseAsString()
         response.disconnect()
 
@@ -438,27 +452,33 @@ class GoogleSheetsDriveService(
     }
 
     private fun getJsonObject(url: String): JsonObject {
-        val httpResponse = requestFactory()
-            .buildGetRequest(GenericUrl(url))
-            .execute()
+        val httpResponse = executeWithRetry {
+            requestFactory()
+                .buildGetRequest(GenericUrl(url))
+                .execute()
+        }
         val response = httpResponse.parseAsString()
         httpResponse.disconnect()
         return JsonParser.parseString(response).asJsonObject
     }
 
     private fun postJson(url: String, body: Any): JsonObject {
-        val httpResponse = requestFactory()
-            .buildPostRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
-            .execute()
+        val httpResponse = executeWithRetry {
+            requestFactory()
+                .buildPostRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
+                .execute()
+        }
         val response = httpResponse.parseAsString()
         httpResponse.disconnect()
         return if (response.isBlank()) JsonObject() else JsonParser.parseString(response).asJsonObject
     }
 
     private fun putJson(url: String, body: Any): JsonObject {
-        val httpResponse = requestFactory()
-            .buildPutRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
-            .execute()
+        val httpResponse = executeWithRetry {
+            requestFactory()
+                .buildPutRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
+                .execute()
+        }
         val response = httpResponse.parseAsString()
         httpResponse.disconnect()
         return if (response.isBlank()) JsonObject() else JsonParser.parseString(response).asJsonObject
@@ -467,10 +487,25 @@ class GoogleSheetsDriveService(
     private fun patchJson(url: String, body: Any): JsonObject {
         val request = requestFactory()
             .buildPatchRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
-        val httpResponse = request.execute()
+        val httpResponse = executeWithRetry { request.execute() }
         val response = httpResponse.parseAsString()
         httpResponse.disconnect()
         return if (response.isBlank()) JsonObject() else JsonParser.parseString(response).asJsonObject
+    }
+
+    private fun <T> executeWithRetry(block: () -> T): T {
+        var delayMs = 500L
+        repeat(3) { attempt ->
+            try {
+                return block()
+            } catch (e: HttpResponseException) {
+                val retryable = e.statusCode == 429 || e.statusCode in 500..599
+                if (!retryable || attempt == 2) throw e
+                Thread.sleep(delayMs)
+                delayMs *= 2
+            }
+        }
+        error("Unreachable retry state")
     }
 
     private fun SheetRow.toGroupOrNull(pages: List<DocumentPage>): DocumentGroup? {

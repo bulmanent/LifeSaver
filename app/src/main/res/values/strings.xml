@@ -37,6 +37,7 @@
     <string name="add_tag">Add</string>
     <string name="save">Save</string>
     <string name="title_required">Title is required</string>
+    <string name="save_and_add_items">Save and add items</string>
 
     <!-- Page dialog -->
     <string name="caption_hint">Caption (optional)</string>
@@ -49,6 +50,7 @@
     <string name="add_text_entry">Add text entry</string>
     <string name="text_entry_hint">Enter text</string>
     <string name="image_entry">Image entry</string>
+    <string name="sequence_hint">Sequence</string>
 
     <!-- Settings -->
     <string name="google_setup">Google Setup</string>

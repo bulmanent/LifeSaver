@@ -49,6 +49,14 @@
             android:text="@string/prev"
             android:textColor="@android:color/white" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit"
+            android:textColor="@android:color/white" />
+
         <TextView
             android:id="@+id/tvPageCounter"
             android:layout_width="0dp"

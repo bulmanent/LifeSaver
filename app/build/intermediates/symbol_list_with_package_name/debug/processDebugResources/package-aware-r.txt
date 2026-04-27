@@ -3736,6 +3736,7 @@ id tvGroupTitle
 id tvPageCount
 id tvPageCounter
 id tvPageSequence
+id tvTextContent
 id unchecked
 id uniform
 id unlabeled
@@ -4003,6 +4004,7 @@ string add_edit_group
 string add_group
 string add_page
 string add_tag
+string add_text_entry
 string androidx_startup
 string app_name
 string appbar_scrolling_view_behavior
@@ -4068,6 +4070,7 @@ string group_detail
 string group_title_hint
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
+string image_entry
 string item_view_role_description
 string m3_exceed_max_badge_text_suffix
 string m3_ref_typeface_brand_medium
@@ -4205,6 +4208,7 @@ string status_bar_notification_info_overflow
 string sync_now
 string tag_hint
 string tags_label
+string text_entry_hint
 string title_required
 string upload
 string view_page

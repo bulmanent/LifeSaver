@@ -40,10 +40,13 @@ public final class FragmentViewPageBinding implements ViewBinding {
   @NonNull
   public final TextView tvPageCounter;
 
+  @NonNull
+  public final TextView tvTextContent;
+
   private FragmentViewPageBinding(@NonNull ConstraintLayout rootView,
       @NonNull LinearLayout bottomBar, @NonNull MaterialButton btnNext,
       @NonNull MaterialButton btnPrev, @NonNull PhotoView photoView, @NonNull TextView tvCaption,
-      @NonNull TextView tvPageCounter) {
+      @NonNull TextView tvPageCounter, @NonNull TextView tvTextContent) {
     this.rootView = rootView;
     this.bottomBar = bottomBar;
     this.btnNext = btnNext;
@@ -51,6 +54,7 @@ public final class FragmentViewPageBinding implements ViewBinding {
     this.photoView = photoView;
     this.tvCaption = tvCaption;
     this.tvPageCounter = tvPageCounter;
+    this.tvTextContent = tvTextContent;
   }
 
   @Override
@@ -116,8 +120,14 @@ public final class FragmentViewPageBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvTextContent;
+      TextView tvTextContent = ViewBindings.findChildViewById(rootView, id);
+      if (tvTextContent == null) {
+        break missingId;
+      }
+
       return new FragmentViewPageBinding((ConstraintLayout) rootView, bottomBar, btnNext, btnPrev,
-          photoView, tvCaption, tvPageCounter);
+          photoView, tvCaption, tvPageCounter, tvTextContent);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

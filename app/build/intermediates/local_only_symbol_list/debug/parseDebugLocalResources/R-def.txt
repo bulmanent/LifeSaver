@@ -67,6 +67,7 @@ id tvGroupTitle
 id tvPageCount
 id tvPageCounter
 id tvPageSequence
+id tvTextContent
 id viewPageFragment
 layout activity_main
 layout fragment_add_edit_group
@@ -87,6 +88,7 @@ string add_edit_group
 string add_group
 string add_page
 string add_tag
+string add_text_entry
 string app_name
 string cancel
 string caption_hint
@@ -107,6 +109,7 @@ string google_sign_in_failed
 string google_sign_in_success
 string group_detail
 string group_title_hint
+string image_entry
 string next
 string no_groups
 string no_pages
@@ -129,6 +132,7 @@ string signed_out
 string sync_now
 string tag_hint
 string tags_label
+string text_entry_hint
 string title_required
 string upload
 string view_page

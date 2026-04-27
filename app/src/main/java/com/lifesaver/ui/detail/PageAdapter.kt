@@ -19,7 +19,7 @@ class PageAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(page: DocumentPage, position: Int) {
-            binding.tvPageSequence.text = "${position + 1}"
+            binding.tvPageSequence.text = page.sequence.toString()
             binding.tvCaption.text = when {
                 page.isTextOnly -> page.textContent.orEmpty()
                 !page.caption.isNullOrBlank() -> page.caption

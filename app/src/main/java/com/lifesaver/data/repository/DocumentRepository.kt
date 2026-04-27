@@ -102,20 +102,25 @@ class DocumentRepository(
         refresh()
     }
 
-    suspend fun addPage(groupId: String, localUri: Uri, caption: String?): DocumentPage {
-        val page = remoteService.addPage(groupId, localUri, caption)
+    suspend fun addPage(groupId: String, localUri: Uri, caption: String?, sequence: Int? = null): DocumentPage {
+        val page = remoteService.addPage(groupId, localUri, caption, sequence)
         refresh()
         return page
     }
 
-    suspend fun addTextPage(groupId: String, textContent: String, caption: String?): DocumentPage {
-        val page = remoteService.addTextPage(groupId, textContent, caption)
+    suspend fun addTextPage(groupId: String, textContent: String, caption: String?, sequence: Int? = null): DocumentPage {
+        val page = remoteService.addTextPage(groupId, textContent, caption, sequence)
         refresh()
         return page
     }
 
     suspend fun deletePage(page: DocumentPage) {
         remoteService.deletePage(page)
+        refresh()
+    }
+
+    suspend fun updatePage(page: DocumentPage) {
+        remoteService.updatePage(page)
         refresh()
     }
 

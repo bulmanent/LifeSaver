@@ -24,16 +24,18 @@ class AddEditGroupViewModel(
             .map { groups -> groups.firstOrNull { it.id == groupId } }
             .asLiveData()
 
-    fun saveGroup(title: String, tags: List<String>, description: String?, onDone: () -> Unit) {
+    fun saveGroup(title: String, tags: List<String>, description: String?, onDone: (DocumentGroup) -> Unit) {
         viewModelScope.launch {
             runCatching {
                 val existing = groupId?.let { repository.getGroupById(it) }
-                if (existing != null) {
-                    repository.updateGroup(existing.copy(title = title, tags = tags, description = description))
+                val saved = if (existing != null) {
+                    val updated = existing.copy(title = title, tags = tags, description = description)
+                    repository.updateGroup(updated)
+                    updated
                 } else {
                     repository.addGroup(title, tags, description)
                 }
-                onDone()
+                onDone(saved)
             }.onFailure {
                 _errorMessage.value = it.message ?: "Unable to save group"
             }

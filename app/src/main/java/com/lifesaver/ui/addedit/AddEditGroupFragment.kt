@@ -14,6 +14,7 @@ import com.google.android.material.chip.Chip
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
 import com.lifesaver.databinding.FragmentAddEditGroupBinding
+import com.lifesaver.model.DocumentGroup
 
 class AddEditGroupFragment : Fragment() {
 
@@ -41,6 +42,7 @@ class AddEditGroupFragment : Fragment() {
 
         setupTagInput()
         setupSaveButton()
+        setupSaveAndAddItemsButton()
         observeExistingGroup()
         observeErrors()
     }
@@ -80,19 +82,34 @@ class AddEditGroupFragment : Fragment() {
 
     private fun setupSaveButton() {
         binding.btnSave.setOnClickListener {
-            val title = binding.etTitle.text.toString().trim()
-            if (title.isBlank()) {
-                binding.tilTitle.error = getString(R.string.title_required)
-                return@setOnClickListener
-            }
-            binding.tilTitle.error = null
-            val description = binding.etDescription.text.toString().trim().ifBlank { null }
-            viewModel.saveGroup(title, currentTags.toList(), description) {
+            saveGroup { _ ->
                 activity?.runOnUiThread {
                     findNavController().popBackStack()
                 }
             }
         }
+    }
+
+    private fun setupSaveAndAddItemsButton() {
+        binding.btnSaveAndAddItems.setOnClickListener {
+            saveGroup { group ->
+                activity?.runOnUiThread {
+                    val action = AddEditGroupFragmentDirections.actionAddEditGroupToDetail(group.id)
+                    findNavController().navigate(action)
+                }
+            }
+        }
+    }
+
+    private fun saveGroup(onDone: (DocumentGroup) -> Unit) {
+        val title = binding.etTitle.text.toString().trim()
+        if (title.isBlank()) {
+            binding.tilTitle.error = getString(R.string.title_required)
+            return
+        }
+        binding.tilTitle.error = null
+        val description = binding.etDescription.text.toString().trim().ifBlank { null }
+        viewModel.saveGroup(title, currentTags.toList(), description, onDone)
     }
 
     private fun observeExistingGroup() {

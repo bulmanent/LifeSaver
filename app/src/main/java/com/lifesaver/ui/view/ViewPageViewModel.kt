@@ -3,6 +3,7 @@ package com.lifesaver.ui.view
 import androidx.lifecycle.*
 import com.lifesaver.data.repository.DocumentRepository
 import com.lifesaver.model.DocumentPage
+import kotlinx.coroutines.launch
 
 class ViewPageViewModel(
     private val repository: DocumentRepository,
@@ -14,6 +15,8 @@ class ViewPageViewModel(
 
     private val _currentIndex = MutableLiveData(0)
     val currentIndex: LiveData<Int> = _currentIndex
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
 
     val currentPage: LiveData<DocumentPage?> = MediatorLiveData<DocumentPage?>().also { mediator ->
         fun update() {
@@ -36,6 +39,17 @@ class ViewPageViewModel(
     fun goPrev() {
         val cur = _currentIndex.value ?: 0
         if (cur > 0) _currentIndex.value = cur - 1
+    }
+
+    fun updatePage(page: DocumentPage) {
+        viewModelScope.launch {
+            runCatching { repository.updatePage(page) }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to update item" }
+        }
+    }
+
+    fun consumeError() {
+        _errorMessage.value = null
     }
 }
 

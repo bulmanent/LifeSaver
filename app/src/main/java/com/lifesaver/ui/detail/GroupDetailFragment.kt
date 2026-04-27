@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
 import com.lifesaver.databinding.FragmentGroupDetailBinding
@@ -166,38 +167,71 @@ class GroupDetailFragment : Fragment() {
     }
 
     private fun showCaptionDialog(uri: Uri) {
+        val sequenceLayout = buildSequenceInput()
         val input = TextInputEditText(requireContext()).apply {
             hint = getString(R.string.caption_hint)
         }
+        val container = buildDialogContainer(sequenceLayout, input)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_page)
-            .setView(input)
+            .setView(container)
             .setPositiveButton(R.string.upload) { _, _ ->
                 val caption = input.text?.toString()?.trim().takeUnless { it.isNullOrBlank() }
-                viewModel.addPage(uri, caption)
+                viewModel.addPage(uri, caption, parseSequence(sequenceLayout))
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun showTextEntryDialog() {
+        val sequenceLayout = buildSequenceInput()
         val input = TextInputEditText(requireContext()).apply {
             hint = getString(R.string.text_entry_hint)
             minLines = 4
         }
+        val container = buildDialogContainer(sequenceLayout, input)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_text_entry)
-            .setView(input)
+            .setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
                 val text = input.text?.toString()?.trim().orEmpty()
                 if (text.isNotBlank()) {
-                    viewModel.addTextPage(text, null)
+                    viewModel.addTextPage(text, null, parseSequence(sequenceLayout))
                 }
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun buildSequenceInput(): TextInputLayout {
+        return TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.sequence_hint)
+            addView(
+                TextInputEditText(context).apply {
+                    setText(nextSequenceValue().toString())
+                    inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                }
+            )
+        }
+    }
+
+    private fun buildDialogContainer(sequenceLayout: TextInputLayout, input: TextInputEditText): View {
+        return android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(48, 24, 48, 0)
+            addView(sequenceLayout)
+            addView(input)
+        }
+    }
+
+    private fun parseSequence(sequenceLayout: TextInputLayout): Int? {
+        return sequenceLayout.editText?.text?.toString()?.trim()?.toIntOrNull()
+    }
+
+    private fun nextSequenceValue(): Int {
+        return (viewModel.pages.value?.maxOfOrNull { it.sequence } ?: -1) + 1
     }
 
     private fun observeData() {
