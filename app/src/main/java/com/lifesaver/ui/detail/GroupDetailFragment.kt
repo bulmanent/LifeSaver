@@ -167,11 +167,11 @@ class GroupDetailFragment : Fragment() {
     }
 
     private fun showCaptionDialog(uri: Uri) {
-        val sequenceLayout = buildSequenceInput()
         val input = TextInputEditText(requireContext()).apply {
             hint = getString(R.string.caption_hint)
         }
-        val container = buildDialogContainer(sequenceLayout, input)
+        val sequenceLayout = buildSequenceInput()
+        val container = buildDialogContainer(input, sequenceLayout)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_page)
@@ -185,12 +185,12 @@ class GroupDetailFragment : Fragment() {
     }
 
     private fun showTextEntryDialog() {
-        val sequenceLayout = buildSequenceInput()
         val input = TextInputEditText(requireContext()).apply {
             hint = getString(R.string.text_entry_hint)
             minLines = 4
         }
-        val container = buildDialogContainer(sequenceLayout, input)
+        val sequenceLayout = buildSequenceInput()
+        val container = buildDialogContainer(input, sequenceLayout)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_text_entry)
@@ -217,12 +217,15 @@ class GroupDetailFragment : Fragment() {
         }
     }
 
-    private fun buildDialogContainer(sequenceLayout: TextInputLayout, input: TextInputEditText): View {
+    private fun buildDialogContainer(
+        primaryInput: TextInputEditText,
+        sequenceLayout: TextInputLayout
+    ): View {
         return android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             setPadding(48, 24, 48, 0)
+            addView(primaryInput)
             addView(sequenceLayout)
-            addView(input)
         }
     }
 

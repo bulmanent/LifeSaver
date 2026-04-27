@@ -103,6 +103,7 @@ string delete_page_message
 string delete_page_title
 string description_hint
 string document_image
+string edit
 string edit_group
 string google_account
 string google_setup

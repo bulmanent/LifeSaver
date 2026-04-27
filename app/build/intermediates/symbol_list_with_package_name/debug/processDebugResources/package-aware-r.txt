@@ -3249,6 +3249,7 @@ id accessibility_custom_action_9
 id actionDown
 id actionDownUp
 id actionUp
+id action_addEditGroup_to_detail
 id action_bar
 id action_bar_activity_content
 id action_bar_container
@@ -3310,9 +3311,11 @@ id bounceBoth
 id bounceEnd
 id bounceStart
 id btnAddTag
+id btnEdit
 id btnNext
 id btnPrev
 id btnSave
+id btnSaveAndAddItems
 id btnSaveConfig
 id btnSignIn
 id btnSignOut
@@ -4054,6 +4057,7 @@ string delete_page_title
 string description_hint
 string dest_title
 string document_image
+string edit
 string edit_group
 string error_a11y_label
 string error_icon_content_description
@@ -4189,6 +4193,7 @@ string pick_from_device
 string prev
 string root_folder_id_hint
 string save
+string save_and_add_items
 string save_google_config
 string search
 string search_hint
@@ -4196,6 +4201,7 @@ string search_menu_title
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description
 string searchview_navigation_content_description
+string sequence_hint
 string settings
 string setup_required_message
 string sheets_id_hint

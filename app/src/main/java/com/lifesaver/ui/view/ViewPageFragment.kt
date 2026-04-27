@@ -97,6 +97,15 @@ class ViewPageFragment : Fragment() {
     }
 
     private fun showEditDialog(page: DocumentPage) {
+        val captionLayout = TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.caption_hint)
+            addView(
+                TextInputEditText(context).apply {
+                    setText(page.caption.orEmpty())
+                }
+            )
+        }
+
         val sequenceLayout = TextInputLayout(requireContext()).apply {
             hint = getString(R.string.sequence_hint)
             addView(
@@ -107,20 +116,11 @@ class ViewPageFragment : Fragment() {
             )
         }
 
-        val captionLayout = TextInputLayout(requireContext()).apply {
-            hint = getString(R.string.caption_hint)
-            addView(
-                TextInputEditText(context).apply {
-                    setText(page.caption.orEmpty())
-                }
-            )
-        }
-
         val container = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 24, 48, 0)
-            addView(sequenceLayout)
             addView(captionLayout)
+            addView(sequenceLayout)
         }
 
         var textLayout: TextInputLayout? = null

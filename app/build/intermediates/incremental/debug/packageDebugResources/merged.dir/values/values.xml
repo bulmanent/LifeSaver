@@ -39,6 +39,7 @@
     <string name="delete_page_title">Delete page?</string>
     <string name="description_hint">Description / notes (e.g. PPS number, important details…)</string>
     <string name="document_image">Document image</string>
+    <string name="edit">Edit</string>
     <string name="edit_group">Edit</string>
     <string name="google_account">Connected Google account</string>
     <string name="google_setup">Google Setup</string>
