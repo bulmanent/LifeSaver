@@ -16,10 +16,6 @@
         "source": "com.lifesaver.app-main-55:/layout/activity_main.xml"
     },
     {
-        "merged": "com.lifesaver.app-debug-53:/layout_dialog_add_page.xml.flat",
-        "source": "com.lifesaver.app-main-55:/layout/dialog_add_page.xml"
-    },
-    {
         "merged": "com.lifesaver.app-debug-53:/mipmap-xhdpi_ic_launcher_round.png.flat",
         "source": "com.lifesaver.app-main-55:/mipmap-xhdpi/ic_launcher_round.png"
     },
@@ -40,12 +36,12 @@
         "source": "com.lifesaver.app-main-55:/layout/item_document_group.xml"
     },
     {
-        "merged": "com.lifesaver.app-debug-53:/xml_file_paths.xml.flat",
-        "source": "com.lifesaver.app-main-55:/xml/file_paths.xml"
-    },
-    {
         "merged": "com.lifesaver.app-debug-53:/layout_fragment_group_detail.xml.flat",
         "source": "com.lifesaver.app-main-55:/layout/fragment_group_detail.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-debug-53:/xml_file_paths.xml.flat",
+        "source": "com.lifesaver.app-main-55:/xml/file_paths.xml"
     },
     {
         "merged": "com.lifesaver.app-debug-53:/layout_item_document_page.xml.flat",

@@ -4,7 +4,7 @@
             "outputFile": "com.lifesaver.app-mergeDebugResources-51:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "/data/gradle/caches/transforms-4/056aaab2aacd2377b8206167ce2033d5/transformed/material-1.12.0/res/values-land/values-land.xml",
+                    "source": "/data/gradle/caches/transforms-4/e0b4a6a935bc0ffa54121d41d4fec0da/transformed/material-1.12.0/res/values-land/values-land.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,26,35,40",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "/data/gradle/caches/transforms-4/8713fa6b60590bcc65b8503bb4446673/transformed/appcompat-1.7.0/res/values-land/values-land.xml",
+                    "source": "/data/gradle/caches/transforms-4/6e4efb3e13da0e6bc34424864624b81c/transformed/appcompat-1.7.0/res/values-land/values-land.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

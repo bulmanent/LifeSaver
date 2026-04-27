@@ -141,7 +141,8 @@ class GroupDetailFragment : Fragment() {
     private fun showImageSourceDialog() {
         val options = arrayOf(
             getString(R.string.pick_from_device),
-            getString(R.string.capture_photo)
+            getString(R.string.capture_photo),
+            getString(R.string.add_text_entry)
         )
 
         MaterialAlertDialogBuilder(requireContext())
@@ -158,6 +159,7 @@ class GroupDetailFragment : Fragment() {
                         )
                         takePhotoLauncher.launch(pendingCameraUri)
                     }
+                    2 -> showTextEntryDialog()
                 }
             }
             .show()
@@ -174,6 +176,25 @@ class GroupDetailFragment : Fragment() {
             .setPositiveButton(R.string.upload) { _, _ ->
                 val caption = input.text?.toString()?.trim().takeUnless { it.isNullOrBlank() }
                 viewModel.addPage(uri, caption)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showTextEntryDialog() {
+        val input = TextInputEditText(requireContext()).apply {
+            hint = getString(R.string.text_entry_hint)
+            minLines = 4
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.add_text_entry)
+            .setView(input)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val text = input.text?.toString()?.trim().orEmpty()
+                if (text.isNotBlank()) {
+                    viewModel.addTextPage(text, null)
+                }
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

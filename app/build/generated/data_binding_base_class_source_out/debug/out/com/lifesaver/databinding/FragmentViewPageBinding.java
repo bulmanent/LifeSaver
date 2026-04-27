@@ -29,9 +29,6 @@ public final class FragmentViewPageBinding implements ViewBinding {
   public final MaterialButton btnNext;
 
   @NonNull
-  public final MaterialButton btnOpenExternal;
-
-  @NonNull
   public final MaterialButton btnPrev;
 
   @NonNull
@@ -43,23 +40,17 @@ public final class FragmentViewPageBinding implements ViewBinding {
   @NonNull
   public final TextView tvPageCounter;
 
-  @NonNull
-  public final TextView tvRemoteHint;
-
   private FragmentViewPageBinding(@NonNull ConstraintLayout rootView,
       @NonNull LinearLayout bottomBar, @NonNull MaterialButton btnNext,
-      @NonNull MaterialButton btnOpenExternal, @NonNull MaterialButton btnPrev,
-      @NonNull PhotoView photoView, @NonNull TextView tvCaption, @NonNull TextView tvPageCounter,
-      @NonNull TextView tvRemoteHint) {
+      @NonNull MaterialButton btnPrev, @NonNull PhotoView photoView, @NonNull TextView tvCaption,
+      @NonNull TextView tvPageCounter) {
     this.rootView = rootView;
     this.bottomBar = bottomBar;
     this.btnNext = btnNext;
-    this.btnOpenExternal = btnOpenExternal;
     this.btnPrev = btnPrev;
     this.photoView = photoView;
     this.tvCaption = tvCaption;
     this.tvPageCounter = tvPageCounter;
-    this.tvRemoteHint = tvRemoteHint;
   }
 
   @Override
@@ -101,12 +92,6 @@ public final class FragmentViewPageBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.btnOpenExternal;
-      MaterialButton btnOpenExternal = ViewBindings.findChildViewById(rootView, id);
-      if (btnOpenExternal == null) {
-        break missingId;
-      }
-
       id = R.id.btnPrev;
       MaterialButton btnPrev = ViewBindings.findChildViewById(rootView, id);
       if (btnPrev == null) {
@@ -131,14 +116,8 @@ public final class FragmentViewPageBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tvRemoteHint;
-      TextView tvRemoteHint = ViewBindings.findChildViewById(rootView, id);
-      if (tvRemoteHint == null) {
-        break missingId;
-      }
-
-      return new FragmentViewPageBinding((ConstraintLayout) rootView, bottomBar, btnNext,
-          btnOpenExternal, btnPrev, photoView, tvCaption, tvPageCounter, tvRemoteHint);
+      return new FragmentViewPageBinding((ConstraintLayout) rootView, bottomBar, btnNext, btnPrev,
+          photoView, tvCaption, tvPageCounter);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

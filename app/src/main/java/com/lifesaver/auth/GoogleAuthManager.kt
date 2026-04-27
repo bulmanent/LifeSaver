@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 
@@ -28,6 +29,15 @@ class GoogleAuthManager(context: Context) {
 
     fun handleSignInResult(data: Intent?): GoogleSignInAccount {
         return GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
+    }
+
+    fun describeSignInFailure(error: Throwable): String {
+        return if (error is ApiException) {
+            val codeName = CommonStatusCodes.getStatusCodeString(error.statusCode)
+            "Google sign-in failed: $codeName (${error.statusCode})"
+        } else {
+            error.message ?: "Google sign-in failed"
+        }
     }
 
     fun currentAccount(): GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(appContext)

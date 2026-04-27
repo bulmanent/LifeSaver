@@ -28,20 +28,20 @@ class SettingsFragment : Fragment() {
 
     private val signInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                runCatching { app.authManager.handleSignInResult(result.data) }
-                    .onSuccess {
-                        viewModel.reloadState()
-                        Toast.makeText(requireContext(), getString(R.string.google_sign_in_success), Toast.LENGTH_SHORT).show()
+            runCatching { app.authManager.handleSignInResult(result.data) }
+                .onSuccess {
+                    viewModel.reloadState()
+                    Toast.makeText(requireContext(), getString(R.string.google_sign_in_success), Toast.LENGTH_SHORT).show()
+                }
+                .onFailure {
+                    val message = if (result.resultCode == Activity.RESULT_CANCELED) {
+                        app.authManager.describeSignInFailure(it)
+                    } else {
+                        app.authManager.describeSignInFailure(it)
                     }
-                    .onFailure {
-                        Toast.makeText(
-                            requireContext(),
-                            it.message ?: getString(R.string.google_sign_in_failed),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-            }
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                    viewModel.reloadState()
+                }
         }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -36,6 +36,18 @@ android {
         viewBinding = true
         buildConfig = true
     }
+
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/LICENSE",
+                    "META-INF/LICENSE.txt",
+                    "META-INF/NOTICE",
+                    "META-INF/NOTICE.txt"
+            ]
+        }
+    }
 }
 
 dependencies {
@@ -59,5 +71,6 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.play.services.auth)
     implementation(libs.google.api.client.android)
+    implementation(libs.google.http.client.android)
     implementation(libs.glide)
 }

@@ -108,6 +108,12 @@ class DocumentRepository(
         return page
     }
 
+    suspend fun addTextPage(groupId: String, textContent: String, caption: String?): DocumentPage {
+        val page = remoteService.addTextPage(groupId, textContent, caption)
+        refresh()
+        return page
+    }
+
     suspend fun deletePage(page: DocumentPage) {
         remoteService.deletePage(page)
         refresh()

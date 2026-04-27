@@ -6,8 +6,10 @@ import android.provider.OpenableColumns
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.GenericUrl
+import com.google.api.client.http.HttpRequest
 import com.google.api.client.http.HttpRequestFactory
 import com.google.api.client.http.HttpResponseException
+import com.google.api.client.http.HttpRequestInitializer
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -98,7 +100,7 @@ class GoogleSheetsDriveService(
             .sortedByDescending { it.rowNumber }
 
         for (row in pageRows) {
-            row.toPageOrNull()?.driveFileId?.let { deleteDriveFile(it) }
+            row.toPageOrNull()?.driveFileId?.takeIf { !it.isNullOrBlank() }?.let { deleteDriveFile(it) }
             deleteRow(PAGES_SHEET, row.rowNumber)
         }
 
@@ -107,7 +109,7 @@ class GoogleSheetsDriveService(
             deleteRow(GROUPS_SHEET, groupRow.rowNumber)
         }
 
-        group.driveFolderId?.takeIf { it.isNotBlank() }?.let { deleteDriveFile(it) }
+        group.driveFolderId?.takeIf { it.isNotBlank() }?.let { deleteDriveFolderRecursively(it) }
     }
 
     suspend fun reorderGroups(groups: List<DocumentGroup>) = withContext(Dispatchers.IO) {
@@ -117,7 +119,7 @@ class GoogleSheetsDriveService(
         val rowsById = readRows(GROUPS_SHEET, GROUP_COLUMNS.size).associateBy { it.valueAt(0) }
         groups.forEachIndexed { index, group ->
             val row = rowsById[group.id] ?: return@forEachIndexed
-            updateRow(GROUPS_SHEET, row.rowNumber, group.copy(sequence = index).toRow())
+            updateRow(GROUPS_SHEET, row.rowNumber, row.values.padToSize(GROUP_COLUMNS.size).updated(2, index.toString()))
         }
     }
 
@@ -153,8 +155,34 @@ class GoogleSheetsDriveService(
                 sequence = sequence,
                 driveFileId = upload.id,
                 caption = caption?.trim()?.takeIf { it.isNotEmpty() },
+                itemType = DocumentPage.TYPE_IMAGE,
+                textContent = null,
                 mimeType = upload.mimeType,
                 fileName = upload.name
+            )
+            appendRow(PAGES_SHEET, page.toRow())
+            page
+        }
+
+    suspend fun addTextPage(groupId: String, textContent: String, caption: String?): DocumentPage =
+        withContext(Dispatchers.IO) {
+            ensureReady()
+            ensureSheetsStructure()
+
+            val groups = fetchAll()
+            val group = groups.firstOrNull { it.id == groupId } ?: error("Group not found")
+            val sequence = group.pages.maxOfOrNull { it.sequence }?.plus(1) ?: 0
+
+            val page = DocumentPage(
+                id = UUID.randomUUID().toString(),
+                groupId = groupId,
+                sequence = sequence,
+                driveFileId = null,
+                caption = caption?.trim()?.takeIf { it.isNotEmpty() },
+                itemType = DocumentPage.TYPE_TEXT,
+                textContent = textContent.trim().takeIf { it.isNotEmpty() },
+                mimeType = "text/plain",
+                fileName = null
             )
             appendRow(PAGES_SHEET, page.toRow())
             page
@@ -164,7 +192,7 @@ class GoogleSheetsDriveService(
         ensureReady()
         ensureSheetsStructure()
 
-        deleteDriveFile(page.driveFileId)
+        page.driveFileId?.takeIf { it.isNotBlank() }?.let { deleteDriveFile(it) }
         val row = findRowById(PAGES_SHEET, page.id, PAGES_COLUMNS.size) ?: return@withContext
         deleteRow(PAGES_SHEET, row.rowNumber)
     }
@@ -179,12 +207,13 @@ class GoogleSheetsDriveService(
 
         pages.forEachIndexed { index, page ->
             val row = rowsById[page.id] ?: return@forEachIndexed
-            updateRow(PAGES_SHEET, row.rowNumber, page.copy(sequence = index).toRow())
+            updateRow(PAGES_SHEET, row.rowNumber, row.values.padToSize(PAGES_COLUMNS.size).updated(2, index.toString()))
         }
     }
 
     fun openDriveFileStream(fileId: String): InputStream {
         ensureReadySync()
+        require(fileId.isNotBlank()) { "Missing Drive file ID" }
         val response = requestFactory()
             .buildGetRequest(GenericUrl("${DRIVE_FILES_URL}/${fileId}?alt=media"))
             .execute()
@@ -240,7 +269,8 @@ class GoogleSheetsDriveService(
     private fun writeHeaderIfNeeded(sheetName: String, headers: List<String>) {
         val range = "$sheetName!A1:${columnName(headers.size)}1"
         val existing = readRange(range)
-        if (existing.isEmpty()) {
+        val current = existing.firstOrNull()
+        if (current == null || current != headers) {
             updateRange(range, listOf(headers))
         }
     }
@@ -334,6 +364,24 @@ class GoogleSheetsDriveService(
         }
     }
 
+    private fun deleteDriveFolderRecursively(folderId: String) {
+        listDriveChildren(folderId).forEach { child ->
+            if (child.mimeType == DRIVE_FOLDER_MIME_TYPE) {
+                deleteDriveFolderRecursively(child.id)
+            } else {
+                deleteDriveFile(child.id)
+            }
+        }
+        deleteDriveFile(folderId)
+    }
+
+    private fun listDriveChildren(folderId: String): List<DriveFileMetadata> {
+        val queryUrl = "$DRIVE_FILES_URL?q='${folderId}'%20in%20parents%20and%20trashed%3Dfalse&fields=files(id,name,mimeType)"
+        val response = getJsonObject(queryUrl)
+        val files = response.getAsJsonArray("files") ?: JsonArray()
+        return files.map { it.asJsonObject.toDriveFileMetadata() }
+    }
+
     private fun uploadDriveFile(folderId: String, groupTitle: String, sourceUri: Uri): DriveFileMetadata {
         val fileBytes = appContext.contentResolver.openInputStream(sourceUri)?.use { it.readBytes() }
             ?: error("Unable to read selected image")
@@ -381,12 +429,12 @@ class GoogleSheetsDriveService(
 
     private fun requestFactory(): HttpRequestFactory {
         val credential = authManager.requireCredential()
-        return transport.createRequestFactory { request ->
+        val initializer = HttpRequestInitializer { request: HttpRequest ->
             credential.initialize(request)
-            request.connectTimeout = 30_000
-            request.readTimeout = 30_000
-            request.headers.accept = "application/json"
+            request.setConnectTimeout(30_000)
+            request.setReadTimeout(30_000)
         }
+        return transport.createRequestFactory(initializer)
     }
 
     private fun getJsonObject(url: String): JsonObject {
@@ -444,10 +492,12 @@ class GoogleSheetsDriveService(
             id = id,
             groupId = valueAt(1),
             sequence = valueAt(2).toIntOrNull() ?: 0,
-            driveFileId = valueAt(3),
+            driveFileId = valueAt(3).ifBlank { null },
             caption = valueAt(4).ifBlank { null },
-            mimeType = valueAt(5).ifBlank { null },
-            fileName = valueAt(6).ifBlank { null }
+            itemType = valueAt(5).ifBlank { DocumentPage.TYPE_IMAGE },
+            textContent = valueAt(6).ifBlank { null },
+            mimeType = valueAt(7).ifBlank { null },
+            fileName = valueAt(8).ifBlank { null }
         )
     }
 
@@ -464,8 +514,10 @@ class GoogleSheetsDriveService(
         id,
         groupId,
         sequence.toString(),
-        driveFileId,
+        driveFileId.orEmpty(),
         caption.orEmpty(),
+        itemType,
+        textContent.orEmpty(),
         mimeType.orEmpty(),
         fileName.orEmpty()
     )
@@ -517,8 +569,16 @@ class GoogleSheetsDriveService(
         private const val GROUPS_SHEET = "Groups"
         private const val PAGES_SHEET = "Pages"
         private val GROUP_COLUMNS = listOf("id", "title", "sequence", "tags", "description", "driveFolderId")
-        private val PAGES_COLUMNS = listOf("id", "groupId", "sequence", "driveFileId", "caption", "mimeType", "fileName")
+        private val PAGES_COLUMNS = listOf("id", "groupId", "sequence", "driveFileId", "caption", "itemType", "textContent", "mimeType", "fileName")
         private const val DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files"
         private const val DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
     }
 }
+
+private fun List<String>.padToSize(size: Int): MutableList<String> =
+    toMutableList().apply {
+        while (this.size < size) add("")
+    }
+
+private fun MutableList<String>.updated(index: Int, value: String): List<String> =
+    apply { this[index] = value }

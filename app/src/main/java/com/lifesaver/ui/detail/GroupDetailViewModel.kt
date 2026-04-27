@@ -6,11 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.lifesaver.data.repository.DocumentRepository
 import com.lifesaver.model.DocumentGroup
 import com.lifesaver.model.DocumentPage
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class GroupDetailViewModel(
@@ -54,6 +54,13 @@ class GroupDetailViewModel(
         viewModelScope.launch {
             runCatching { repository.addPage(groupId, uri, caption) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to upload image" }
+        }
+    }
+
+    fun addTextPage(textContent: String, caption: String?) {
+        viewModelScope.launch {
+            runCatching { repository.addTextPage(groupId, textContent, caption) }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to save text entry" }
         }
     }
 

@@ -20,14 +20,22 @@ class PageAdapter(
 
         fun bind(page: DocumentPage, position: Int) {
             binding.tvPageSequence.text = "${position + 1}"
-            binding.tvCaption.text = page.caption ?: ""
+            binding.tvCaption.text = when {
+                page.isTextOnly -> page.textContent.orEmpty()
+                !page.caption.isNullOrBlank() -> page.caption
+                else -> binding.root.context.getString(com.lifesaver.R.string.image_entry)
+            }
 
-            Glide.with(binding.ivPageThumb)
-                .load(DriveImageRef(page.driveFileId))
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .error(android.R.drawable.ic_menu_report_image)
-                .centerCrop()
-                .into(binding.ivPageThumb)
+            if (page.isTextOnly) {
+                binding.ivPageThumb.setImageResource(android.R.drawable.ic_menu_edit)
+            } else {
+                Glide.with(binding.ivPageThumb)
+                    .load(DriveImageRef(page.driveFileId.orEmpty()))
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_report_image)
+                    .centerCrop()
+                    .into(binding.ivPageThumb)
+            }
 
             binding.root.setOnClickListener { onItemClick(page, position) }
             binding.root.setOnLongClickListener { onItemLongClick(page) }

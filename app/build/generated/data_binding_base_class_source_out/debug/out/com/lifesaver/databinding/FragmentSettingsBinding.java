@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.lifesaver.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -21,20 +22,39 @@ public final class FragmentSettingsBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final MaterialButton btnExport;
+  public final MaterialButton btnSaveConfig;
 
   @NonNull
-  public final MaterialButton btnImport;
+  public final MaterialButton btnSignIn;
 
   @NonNull
-  public final TextView tvAppVersion;
+  public final MaterialButton btnSignOut;
 
-  private FragmentSettingsBinding(@NonNull ScrollView rootView, @NonNull MaterialButton btnExport,
-      @NonNull MaterialButton btnImport, @NonNull TextView tvAppVersion) {
+  @NonNull
+  public final MaterialButton btnSyncNow;
+
+  @NonNull
+  public final TextInputEditText etRootFolderId;
+
+  @NonNull
+  public final TextInputEditText etSheetsId;
+
+  @NonNull
+  public final TextView tvGoogleAccount;
+
+  private FragmentSettingsBinding(@NonNull ScrollView rootView,
+      @NonNull MaterialButton btnSaveConfig, @NonNull MaterialButton btnSignIn,
+      @NonNull MaterialButton btnSignOut, @NonNull MaterialButton btnSyncNow,
+      @NonNull TextInputEditText etRootFolderId, @NonNull TextInputEditText etSheetsId,
+      @NonNull TextView tvGoogleAccount) {
     this.rootView = rootView;
-    this.btnExport = btnExport;
-    this.btnImport = btnImport;
-    this.tvAppVersion = tvAppVersion;
+    this.btnSaveConfig = btnSaveConfig;
+    this.btnSignIn = btnSignIn;
+    this.btnSignOut = btnSignOut;
+    this.btnSyncNow = btnSyncNow;
+    this.etRootFolderId = etRootFolderId;
+    this.etSheetsId = etSheetsId;
+    this.tvGoogleAccount = tvGoogleAccount;
   }
 
   @Override
@@ -64,25 +84,50 @@ public final class FragmentSettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.btnExport;
-      MaterialButton btnExport = ViewBindings.findChildViewById(rootView, id);
-      if (btnExport == null) {
+      id = R.id.btnSaveConfig;
+      MaterialButton btnSaveConfig = ViewBindings.findChildViewById(rootView, id);
+      if (btnSaveConfig == null) {
         break missingId;
       }
 
-      id = R.id.btnImport;
-      MaterialButton btnImport = ViewBindings.findChildViewById(rootView, id);
-      if (btnImport == null) {
+      id = R.id.btnSignIn;
+      MaterialButton btnSignIn = ViewBindings.findChildViewById(rootView, id);
+      if (btnSignIn == null) {
         break missingId;
       }
 
-      id = R.id.tvAppVersion;
-      TextView tvAppVersion = ViewBindings.findChildViewById(rootView, id);
-      if (tvAppVersion == null) {
+      id = R.id.btnSignOut;
+      MaterialButton btnSignOut = ViewBindings.findChildViewById(rootView, id);
+      if (btnSignOut == null) {
         break missingId;
       }
 
-      return new FragmentSettingsBinding((ScrollView) rootView, btnExport, btnImport, tvAppVersion);
+      id = R.id.btnSyncNow;
+      MaterialButton btnSyncNow = ViewBindings.findChildViewById(rootView, id);
+      if (btnSyncNow == null) {
+        break missingId;
+      }
+
+      id = R.id.etRootFolderId;
+      TextInputEditText etRootFolderId = ViewBindings.findChildViewById(rootView, id);
+      if (etRootFolderId == null) {
+        break missingId;
+      }
+
+      id = R.id.etSheetsId;
+      TextInputEditText etSheetsId = ViewBindings.findChildViewById(rootView, id);
+      if (etSheetsId == null) {
+        break missingId;
+      }
+
+      id = R.id.tvGoogleAccount;
+      TextView tvGoogleAccount = ViewBindings.findChildViewById(rootView, id);
+      if (tvGoogleAccount == null) {
+        break missingId;
+      }
+
+      return new FragmentSettingsBinding((ScrollView) rootView, btnSaveConfig, btnSignIn,
+          btnSignOut, btnSyncNow, etRootFolderId, etSheetsId, tvGoogleAccount);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

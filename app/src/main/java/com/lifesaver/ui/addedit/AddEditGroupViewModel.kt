@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.lifesaver.data.repository.DocumentRepository
 import com.lifesaver.model.DocumentGroup
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class AddEditGroupViewModel(

@@ -35,8 +35,8 @@ class DriveImageModelLoader(
             try {
                 stream = service.openDriveFileStream(model.fileId)
                 callback.onDataReady(stream)
-            } catch (t: Throwable) {
-                callback.onLoadFailed(t)
+            } catch (e: Exception) {
+                callback.onLoadFailed(e)
             }
         }
 

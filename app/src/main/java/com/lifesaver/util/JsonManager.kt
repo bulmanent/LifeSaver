@@ -25,8 +25,10 @@ data class PageExport(
     val id: String,
     val groupId: String,
     val sequence: Int,
-    val driveFileId: String,
+    val driveFileId: String?,
     val caption: String?,
+    val itemType: String,
+    val textContent: String?,
     val mimeType: String?,
     val fileName: String?
 )
@@ -51,6 +53,8 @@ object JsonManager {
                         sequence = page.sequence,
                         driveFileId = page.driveFileId,
                         caption = page.caption,
+                        itemType = page.itemType,
+                        textContent = page.textContent,
                         mimeType = page.mimeType,
                         fileName = page.fileName
                     )
@@ -78,6 +82,8 @@ object JsonManager {
                         sequence = pe.sequence,
                         driveFileId = pe.driveFileId,
                         caption = pe.caption,
+                        itemType = pe.itemType,
+                        textContent = pe.textContent,
                         mimeType = pe.mimeType,
                         fileName = pe.fileName
                     )

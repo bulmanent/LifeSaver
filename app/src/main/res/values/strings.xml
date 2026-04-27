@@ -46,6 +46,9 @@
     <string name="delete">Delete</string>
     <string name="pick_from_device">Pick from device</string>
     <string name="capture_photo">Capture photo</string>
+    <string name="add_text_entry">Add text entry</string>
+    <string name="text_entry_hint">Enter text</string>
+    <string name="image_entry">Image entry</string>
 
     <!-- Settings -->
     <string name="google_setup">Google Setup</string>

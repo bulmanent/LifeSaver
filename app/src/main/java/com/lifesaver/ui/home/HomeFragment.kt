@@ -14,7 +14,6 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,11 +57,6 @@ class HomeFragment : Fragment() {
             binding.recyclerGroups.visibility = View.GONE
             binding.tvEmpty.visibility = View.VISIBLE
             binding.tvEmpty.text = getString(R.string.setup_required_message)
-            viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-                if (findNavController().currentDestination?.id == R.id.homeFragment) {
-                    findNavController().navigate(R.id.action_home_to_settings)
-                }
-            }
         } else {
             binding.fabAddGroup.show()
             binding.recyclerGroups.visibility = View.VISIBLE

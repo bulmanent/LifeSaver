@@ -62,10 +62,18 @@ class ViewPageFragment : Fragment() {
         binding.tvPageCounter.text = getString(R.string.page_counter, index + 1, total)
         binding.tvCaption.text = page.caption ?: ""
 
-        Glide.with(this)
-            .load(DriveImageRef(page.driveFileId))
-            .error(android.R.drawable.ic_menu_report_image)
-            .into(binding.photoView)
+        if (page.isTextOnly) {
+            binding.photoView.visibility = View.GONE
+            binding.tvTextContent.visibility = View.VISIBLE
+            binding.tvTextContent.text = page.textContent.orEmpty()
+        } else {
+            binding.photoView.visibility = View.VISIBLE
+            binding.tvTextContent.visibility = View.GONE
+            Glide.with(this)
+                .load(DriveImageRef(page.driveFileId.orEmpty()))
+                .error(android.R.drawable.ic_menu_report_image)
+                .into(binding.photoView)
+        }
     }
 
     private fun updateNavButtons(index: Int, size: Int) {

@@ -4,7 +4,7 @@
             "outputFile": "com.lifesaver.app-mergeDebugResources-51:/values-en-rXC/values-en-rXC.xml",
             "map": [
                 {
-                    "source": "/data/gradle/caches/transforms-4/ce1b93ca717a9b90dfe4136cad6260a7/transformed/core-1.13.1/res/values-en-rXC/values-en-rXC.xml",
+                    "source": "/data/gradle/caches/transforms-4/015feb57d1468c423523ab2f048b42d5/transformed/core-1.13.1/res/values-en-rXC/values-en-rXC.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/data/gradle/caches/transforms-4/8713fa6b60590bcc65b8503bb4446673/transformed/appcompat-1.7.0/res/values-en-rXC/values-en-rXC.xml",
+                    "source": "/data/gradle/caches/transforms-4/6e4efb3e13da0e6bc34424864624b81c/transformed/appcompat-1.7.0/res/values-en-rXC/values-en-rXC.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

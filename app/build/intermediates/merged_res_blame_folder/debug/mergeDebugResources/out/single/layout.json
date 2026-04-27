@@ -28,10 +28,6 @@
         "source": "com.lifesaver.app-main-55:/layout/fragment_add_edit_group.xml"
     },
     {
-        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/dialog_add_page.xml",
-        "source": "com.lifesaver.app-main-55:/layout/dialog_add_page.xml"
-    },
-    {
         "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_home.xml",
         "source": "com.lifesaver.app-main-55:/layout/fragment_home.xml"
     }
