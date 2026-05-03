@@ -20,6 +20,8 @@ class ViewPageViewModel(
     val errorMessage: LiveData<String?> = _errorMessage
     private val _openFileUri = MutableLiveData<Uri?>()
     val openFileUri: LiveData<Uri?> = _openFileUri
+    private val _shareRequest = MutableLiveData<ShareRequest?>()
+    val shareRequest: LiveData<ShareRequest?> = _shareRequest
 
     val currentPage: LiveData<DocumentPage?> = MediatorLiveData<DocumentPage?>().also { mediator ->
         fun update() {
@@ -61,8 +63,42 @@ class ViewPageViewModel(
         }
     }
 
+    fun shareCurrentItem() {
+        val page = currentPage.value ?: return
+        if (page.isTextOnly) {
+            val text = buildString {
+                page.caption?.takeIf { it.isNotBlank() }?.let {
+                    append(it)
+                    append("\n\n")
+                }
+                append(page.textContent.orEmpty())
+            }.trim()
+            if (text.isBlank()) {
+                _errorMessage.value = "Nothing to share"
+            } else {
+                _shareRequest.value = ShareRequest.Text(text)
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching { repository.prepareDriveFileForViewing(page) }
+                .onSuccess {
+                    _shareRequest.value = ShareRequest.File(
+                        uri = it,
+                        mimeType = page.mimeType ?: "*/*"
+                    )
+                }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to prepare item for sharing" }
+        }
+    }
+
     fun consumeOpenFileUri() {
         _openFileUri.value = null
+    }
+
+    fun consumeShareRequest() {
+        _shareRequest.value = null
     }
 
     fun consumeError() {
@@ -78,4 +114,9 @@ class ViewPageViewModelFactory(
         @Suppress("UNCHECKED_CAST")
         return ViewPageViewModel(repository, groupId) as T
     }
+}
+
+sealed class ShareRequest {
+    data class Text(val content: String) : ShareRequest()
+    data class File(val uri: Uri, val mimeType: String) : ShareRequest()
 }

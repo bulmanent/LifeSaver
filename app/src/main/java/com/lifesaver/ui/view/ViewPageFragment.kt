@@ -54,6 +54,9 @@ class ViewPageFragment : Fragment() {
         binding.btnOpenFile.setOnClickListener {
             viewModel.openCurrentFile()
         }
+        binding.btnShare.setOnClickListener {
+            viewModel.shareCurrentItem()
+        }
 
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             updateNavButtons(viewModel.currentIndex.value ?: 0, pages.size)
@@ -76,6 +79,20 @@ class ViewPageFragment : Fragment() {
             }
         }
 
+        viewModel.shareRequest.observe(viewLifecycleOwner) { request ->
+            when (request) {
+                is ShareRequest.File -> {
+                    shareFile(request.uri, request.mimeType)
+                    viewModel.consumeShareRequest()
+                }
+                is ShareRequest.Text -> {
+                    shareText(request.content)
+                    viewModel.consumeShareRequest()
+                }
+                null -> Unit
+            }
+        }
+
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             if (!message.isNullOrBlank()) {
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
@@ -93,12 +110,14 @@ class ViewPageFragment : Fragment() {
         if (page.isTextOnly) {
             binding.photoView.visibility = View.GONE
             binding.btnOpenFile.visibility = View.GONE
+            binding.btnShare.visibility = View.VISIBLE
             binding.tvTextContent.visibility = View.VISIBLE
             binding.tvTextContent.gravity = Gravity.CENTER
             binding.tvTextContent.text = page.textContent.orEmpty()
         } else if (page.isImage) {
             binding.photoView.visibility = View.VISIBLE
             binding.btnOpenFile.visibility = View.GONE
+            binding.btnShare.visibility = View.VISIBLE
             binding.tvTextContent.visibility = View.GONE
             Glide.with(this)
                 .load(DriveImageRef(page.driveFileId.orEmpty()))
@@ -107,6 +126,7 @@ class ViewPageFragment : Fragment() {
         } else {
             binding.photoView.visibility = View.GONE
             binding.btnOpenFile.visibility = View.VISIBLE
+            binding.btnShare.visibility = View.VISIBLE
             binding.tvTextContent.visibility = View.VISIBLE
             binding.tvTextContent.gravity = Gravity.CENTER
             binding.tvTextContent.text = buildString {
@@ -194,6 +214,23 @@ class ViewPageFragment : Fragment() {
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(requireContext(), R.string.no_app_found_for_file, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun shareFile(uri: android.net.Uri, mimeType: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = mimeType
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(intent, getString(R.string.share_item)))
+    }
+
+    private fun shareText(content: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, content)
+        }
+        startActivity(Intent.createChooser(intent, getString(R.string.share_item)))
     }
 
     override fun onDestroyView() {

@@ -55,6 +55,7 @@
     <string name="file_entry">File entry</string>
     <string name="sequence_hint">Sequence</string>
     <string name="open_file">Open file</string>
+    <string name="share_item">Share</string>
     <string name="no_app_found_for_file">No app found to open this file type</string>
     <string name="gmail_access_required">Grant Gmail read-only access to import attachments.</string>
     <string name="gmail_subject_search_title">Search Gmail subject</string>

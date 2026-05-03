@@ -4067,6 +4067,9 @@ int string fab_transformation_sheet_behavior 0x7f110058
 int string file_entry 0x7f1100f3
 int string gmail_access_required 0x7f1100f7
 int string gmail_attachment_item 0x7f1100f8
+int string gmail_subject_search_hint 0x7f1100fd
+int string gmail_subject_search_required 0x7f1100fe
+int string gmail_subject_search_title 0x7f1100ff
 int string google_account 0x7f110059
 int string google_setup 0x7f11005a
 int string google_setup_description 0x7f11005b
