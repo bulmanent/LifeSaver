@@ -46,12 +46,15 @@
     <string name="upload">Upload</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
-    <string name="pick_from_device">Pick from device</string>
+    <string name="pick_file">Pick file from device</string>
     <string name="capture_photo">Capture photo</string>
     <string name="add_text_entry">Add text entry</string>
     <string name="text_entry_hint">Enter text</string>
     <string name="image_entry">Image entry</string>
+    <string name="file_entry">File entry</string>
     <string name="sequence_hint">Sequence</string>
+    <string name="open_file">Open file</string>
+    <string name="no_app_found_for_file">No app found to open this file type</string>
 
     <!-- Settings -->
     <string name="google_setup">Google Setup</string>
@@ -67,5 +70,5 @@
     <string name="google_sign_in_success">Google account connected</string>
     <string name="google_sign_in_failed">Google sign-in failed</string>
     <string name="signed_out">Signed out</string>
-    <string name="google_setup_footer">LifeSaver reads Groups and Pages directly from Google Sheets and stores images directly in Google Drive. The sheet and folder must already exist and be shared with this Google account.</string>
+    <string name="google_setup_footer">LifeSaver reads Groups and Pages directly from Google Sheets and stores files directly in Google Drive. The sheet and folder must already exist and be shared with this Google account.</string>
 </resources>

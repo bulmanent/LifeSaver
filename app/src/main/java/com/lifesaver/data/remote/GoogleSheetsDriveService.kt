@@ -3,6 +3,7 @@ package com.lifesaver.data.remote
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.core.content.FileProvider
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.GenericUrl
@@ -155,7 +156,7 @@ class GoogleSheetsDriveService(
                 sequence = sequence ?: nextSequence,
                 driveFileId = upload.id,
                 caption = caption?.trim()?.takeIf { it.isNotEmpty() },
-                itemType = DocumentPage.TYPE_IMAGE,
+                itemType = itemTypeForMimeType(upload.mimeType),
                 textContent = null,
                 mimeType = upload.mimeType,
                 fileName = upload.name
@@ -230,6 +231,24 @@ class GoogleSheetsDriveService(
         val bytes = response.content.readBytes()
         response.disconnect()
         return ByteArrayInputStream(bytes)
+    }
+
+    suspend fun prepareDriveFileForViewing(page: DocumentPage): Uri = withContext(Dispatchers.IO) {
+        ensureReadySync()
+        val fileId = page.driveFileId?.takeIf { it.isNotBlank() } ?: error("Missing Drive file ID")
+        val fileBytes = openDriveFileStream(fileId).use { it.readBytes() }
+        val downloadsDir = java.io.File(appContext.cacheDir, "viewer").apply { mkdirs() }
+        val fileName = sanitizeFileName(
+            page.fileName
+                ?: buildUploadFileName("LifeSaver", null, page.mimeType ?: DEFAULT_FILE_MIME_TYPE)
+        )
+        val file = java.io.File(downloadsDir, fileName)
+        file.writeBytes(fileBytes)
+        FileProvider.getUriForFile(
+            appContext,
+            "${appContext.packageName}.fileprovider",
+            file
+        )
     }
 
     private fun ensureReadySync() {
@@ -396,8 +415,8 @@ class GoogleSheetsDriveService(
 
     private fun uploadDriveFile(folderId: String, groupTitle: String, sourceUri: Uri): DriveFileMetadata {
         val fileBytes = appContext.contentResolver.openInputStream(sourceUri)?.use { it.readBytes() }
-            ?: error("Unable to read selected image")
-        val mimeType = appContext.contentResolver.getType(sourceUri) ?: "image/jpeg"
+            ?: error("Unable to read selected file")
+        val mimeType = appContext.contentResolver.getType(sourceUri) ?: DEFAULT_FILE_MIME_TYPE
         val originalName = queryDisplayName(sourceUri)
         val fileName = buildUploadFileName(groupTitle, originalName, mimeType)
 
@@ -566,14 +585,28 @@ class GoogleSheetsDriveService(
 
     private fun buildUploadFileName(groupTitle: String, originalName: String?, mimeType: String): String {
         val extension = originalName?.substringAfterLast('.', "")?.takeIf { it.isNotBlank() }
-            ?: mimeType.substringAfter('/', "jpg").substringBefore(';')
+            ?: mimeType.substringAfter('/', "bin").substringBefore(';')
         return "${sanitizeFolderName(groupTitle)}_${System.currentTimeMillis()}.$extension"
+    }
+
+    private fun itemTypeForMimeType(mimeType: String?): String {
+        return if (mimeType?.startsWith("image/") == true) {
+            DocumentPage.TYPE_IMAGE
+        } else {
+            DocumentPage.TYPE_FILE
+        }
     }
 
     private fun sanitizeFolderName(raw: String): String {
         return raw.trim()
             .replace(Regex("""[\\/:*?"<>|]"""), "_")
             .ifBlank { "LifeSaver" }
+    }
+
+    private fun sanitizeFileName(raw: String): String {
+        return raw.trim()
+            .replace(Regex("""[\\/:*?"<>|]"""), "_")
+            .ifBlank { "lifesaver_file" }
     }
 
     private fun columnName(columnCount: Int): String {
@@ -607,6 +640,7 @@ class GoogleSheetsDriveService(
         private val PAGES_COLUMNS = listOf("id", "groupId", "sequence", "driveFileId", "caption", "itemType", "textContent", "mimeType", "fileName")
         private const val DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files"
         private const val DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
+        private const val DEFAULT_FILE_MIME_TYPE = "application/octet-stream"
     }
 }
 

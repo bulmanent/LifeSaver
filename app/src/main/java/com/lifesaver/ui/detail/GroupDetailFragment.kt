@@ -1,5 +1,6 @@
 package com.lifesaver.ui.detail
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -47,8 +48,11 @@ class GroupDetailFragment : Fragment() {
     private lateinit var adapter: PageAdapter
     private var pendingCameraUri: Uri? = null
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let(::showCaptionDialog)
+    private val pickDocumentLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            requireContext().contentResolver.takePersistableReadPermissionIfPossible(it)
+            showCaptionDialog(it)
+        }
     }
 
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -141,7 +145,7 @@ class GroupDetailFragment : Fragment() {
 
     private fun showImageSourceDialog() {
         val options = arrayOf(
-            getString(R.string.pick_from_device),
+            getString(R.string.pick_file),
             getString(R.string.capture_photo),
             getString(R.string.add_text_entry)
         )
@@ -150,7 +154,7 @@ class GroupDetailFragment : Fragment() {
             .setTitle(R.string.add_page)
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> pickImageLauncher.launch(arrayOf("image/*"))
+                    0 -> pickDocumentLauncher.launch(arrayOf("*/*"))
                     1 -> {
                         val file = File(requireContext().cacheDir, "captured_${System.currentTimeMillis()}.jpg")
                         pendingCameraUri = FileProvider.getUriForFile(
@@ -278,5 +282,13 @@ class GroupDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+}
+
+private fun android.content.ContentResolver.takePersistableReadPermissionIfPossible(uri: Uri) {
+    try {
+        takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    } catch (_: SecurityException) {
+    } catch (_: IllegalArgumentException) {
     }
 }

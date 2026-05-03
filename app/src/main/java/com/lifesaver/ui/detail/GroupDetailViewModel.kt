@@ -53,7 +53,7 @@ class GroupDetailViewModel(
     fun addPage(uri: Uri, caption: String?, sequence: Int?) {
         viewModelScope.launch {
             runCatching { repository.addPage(groupId, uri, caption, sequence) }
-                .onFailure { _errorMessage.value = it.message ?: "Unable to upload image" }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to upload file" }
         }
     }
 

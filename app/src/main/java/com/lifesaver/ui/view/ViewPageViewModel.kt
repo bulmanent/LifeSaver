@@ -1,5 +1,6 @@
 package com.lifesaver.ui.view
 
+import android.net.Uri
 import androidx.lifecycle.*
 import com.lifesaver.data.repository.DocumentRepository
 import com.lifesaver.model.DocumentPage
@@ -17,6 +18,8 @@ class ViewPageViewModel(
     val currentIndex: LiveData<Int> = _currentIndex
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
+    private val _openFileUri = MutableLiveData<Uri?>()
+    val openFileUri: LiveData<Uri?> = _openFileUri
 
     val currentPage: LiveData<DocumentPage?> = MediatorLiveData<DocumentPage?>().also { mediator ->
         fun update() {
@@ -46,6 +49,20 @@ class ViewPageViewModel(
             runCatching { repository.updatePage(page) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to update item" }
         }
+    }
+
+    fun openCurrentFile() {
+        val page = currentPage.value ?: return
+        if (!page.isFile) return
+        viewModelScope.launch {
+            runCatching { repository.prepareDriveFileForViewing(page) }
+                .onSuccess { _openFileUri.value = it }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to open file" }
+        }
+    }
+
+    fun consumeOpenFileUri() {
+        _openFileUri.value = null
     }
 
     fun consumeError() {

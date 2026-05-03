@@ -108,6 +108,10 @@ class DocumentRepository(
         return page
     }
 
+    suspend fun prepareDriveFileForViewing(page: DocumentPage): Uri {
+        return remoteService.prepareDriveFileForViewing(page)
+    }
+
     suspend fun addTextPage(groupId: String, textContent: String, caption: String?, sequence: Int? = null): DocumentPage {
         val page = remoteService.addTextPage(groupId, textContent, caption, sequence)
         refresh()

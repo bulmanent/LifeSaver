@@ -1,5 +1,8 @@
 package com.lifesaver.ui.view
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.view.Gravity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -48,6 +51,9 @@ class ViewPageFragment : Fragment() {
         binding.btnEdit.setOnClickListener {
             viewModel.currentPage.value?.let(::showEditDialog)
         }
+        binding.btnOpenFile.setOnClickListener {
+            viewModel.openCurrentFile()
+        }
 
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             updateNavButtons(viewModel.currentIndex.value ?: 0, pages.size)
@@ -60,6 +66,13 @@ class ViewPageFragment : Fragment() {
         viewModel.currentPage.observe(viewLifecycleOwner) { page ->
             if (page != null) {
                 displayPage(page)
+            }
+        }
+
+        viewModel.openFileUri.observe(viewLifecycleOwner) { uri ->
+            if (uri != null) {
+                openFile(uri, viewModel.currentPage.value?.mimeType)
+                viewModel.consumeOpenFileUri()
             }
         }
 
@@ -79,15 +92,30 @@ class ViewPageFragment : Fragment() {
 
         if (page.isTextOnly) {
             binding.photoView.visibility = View.GONE
+            binding.btnOpenFile.visibility = View.GONE
             binding.tvTextContent.visibility = View.VISIBLE
+            binding.tvTextContent.gravity = Gravity.CENTER
             binding.tvTextContent.text = page.textContent.orEmpty()
-        } else {
+        } else if (page.isImage) {
             binding.photoView.visibility = View.VISIBLE
+            binding.btnOpenFile.visibility = View.GONE
             binding.tvTextContent.visibility = View.GONE
             Glide.with(this)
                 .load(DriveImageRef(page.driveFileId.orEmpty()))
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(binding.photoView)
+        } else {
+            binding.photoView.visibility = View.GONE
+            binding.btnOpenFile.visibility = View.VISIBLE
+            binding.tvTextContent.visibility = View.VISIBLE
+            binding.tvTextContent.gravity = Gravity.CENTER
+            binding.tvTextContent.text = buildString {
+                append(page.fileName ?: getString(R.string.file_entry))
+                page.mimeType?.takeIf { it.isNotBlank() }?.let {
+                    append("\n")
+                    append(it)
+                }
+            }
         }
     }
 
@@ -154,6 +182,18 @@ class ViewPageFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun openFile(uri: android.net.Uri, mimeType: String?) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, mimeType ?: "*/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.no_app_found_for_file, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onDestroyView() {

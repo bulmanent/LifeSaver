@@ -14,8 +14,15 @@ data class DocumentPage(
     val isTextOnly: Boolean
         get() = itemType == TYPE_TEXT
 
+    val isImage: Boolean
+        get() = itemType == TYPE_IMAGE || mimeType?.startsWith("image/") == true
+
+    val isFile: Boolean
+        get() = itemType == TYPE_FILE || (!isTextOnly && !isImage)
+
     companion object {
         const val TYPE_IMAGE = "image"
         const val TYPE_TEXT = "text"
+        const val TYPE_FILE = "file"
     }
 }
