@@ -3,6 +3,7 @@ package com.lifesaver.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,6 +28,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.lifesaver.LifeSaverApplication
 import com.lifesaver.R
+import com.lifesaver.data.remote.GmailAttachmentSummary
+import com.lifesaver.data.remote.GmailMessageSummary
 import com.lifesaver.databinding.FragmentGroupDetailBinding
 import com.lifesaver.model.DocumentPage
 import java.io.File
@@ -61,6 +64,20 @@ class GroupDetailFragment : Fragment() {
         }
     }
 
+    private val gmailAccessLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val app = requireActivity().application as LifeSaverApplication
+            runCatching { app.authManager.handleSignInResult(result.data) }
+                .onSuccess { viewModel.loadRecentGmailMessages() }
+                .onFailure {
+                    Toast.makeText(
+                        requireContext(),
+                        app.authManager.describeSignInFailure(it),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+        }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGroupDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -74,6 +91,7 @@ class GroupDetailFragment : Fragment() {
         setupFab()
         observeData()
         observeErrors()
+        observeGmailMessages()
         viewModel.refresh()
     }
 
@@ -147,7 +165,8 @@ class GroupDetailFragment : Fragment() {
         val options = arrayOf(
             getString(R.string.pick_file),
             getString(R.string.capture_photo),
-            getString(R.string.add_text_entry)
+            getString(R.string.add_text_entry),
+            getString(R.string.import_from_gmail)
         )
 
         MaterialAlertDialogBuilder(requireContext())
@@ -165,9 +184,20 @@ class GroupDetailFragment : Fragment() {
                         takePhotoLauncher.launch(pendingCameraUri)
                     }
                     2 -> showTextEntryDialog()
+                    3 -> startGmailImport()
                 }
             }
             .show()
+    }
+
+    private fun startGmailImport() {
+        if (!viewModel.hasGmailAccess()) {
+            Toast.makeText(requireContext(), R.string.gmail_access_required, Toast.LENGTH_LONG).show()
+            val app = requireActivity().application as LifeSaverApplication
+            gmailAccessLauncher.launch(app.authManager.gmailAccessSignInIntent())
+            return
+        }
+        viewModel.loadRecentGmailMessages()
     }
 
     private fun showCaptionDialog(uri: Uri) {
@@ -268,6 +298,77 @@ class GroupDetailFragment : Fragment() {
                 viewModel.consumeError()
             }
         }
+    }
+
+    private fun observeGmailMessages() {
+        viewModel.gmailMessages.observe(viewLifecycleOwner) { messages ->
+            messages ?: return@observe
+            if (messages.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.no_gmail_messages_found, Toast.LENGTH_LONG).show()
+                viewModel.consumeGmailMessages()
+                return@observe
+            }
+            showGmailMessagePicker(messages)
+            viewModel.consumeGmailMessages()
+        }
+    }
+
+    private fun showGmailMessagePicker(messages: List<GmailMessageSummary>) {
+        val items = messages.map { message ->
+            buildString {
+                append(message.subject)
+                append("\n")
+                append(message.from)
+                if (message.dateText.isNotBlank()) {
+                    append(" • ")
+                    append(message.dateText)
+                }
+                append(" • ")
+                append(message.attachments.size)
+            }
+        }.toTypedArray()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.select_email)
+            .setItems(items) { _, which ->
+                showGmailAttachmentPicker(messages[which])
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showGmailAttachmentPicker(message: GmailMessageSummary) {
+        val items = message.attachments.map { attachment ->
+            val sizeText = Formatter.formatShortFileSize(requireContext(), attachment.sizeBytes.toLong())
+            getString(R.string.gmail_attachment_item, attachment.fileName, sizeText)
+        }.toTypedArray()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.select_attachment)
+            .setItems(items) { _, which ->
+                showGmailCaptionDialog(message.attachments[which])
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showGmailCaptionDialog(attachment: GmailAttachmentSummary) {
+        val input = TextInputEditText(requireContext()).apply {
+            hint = getString(R.string.caption_hint)
+            setText(attachment.subject ?: attachment.fileName)
+        }
+        val sequenceLayout = buildSequenceInput()
+        val container = buildDialogContainer(input, sequenceLayout)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.import_from_gmail)
+            .setView(container)
+            .setPositiveButton(R.string.upload) { _, _ ->
+                val caption = input.text?.toString()?.trim().takeUnless { it.isNullOrBlank() }
+                viewModel.importGmailAttachment(attachment, caption, parseSequence(sequenceLayout))
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun confirmDeletePage(page: DocumentPage) {

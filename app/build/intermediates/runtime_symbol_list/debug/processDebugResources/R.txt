@@ -3312,6 +3312,7 @@ int id bounceStart 0x7f08006f
 int id btnAddTag 0x7f080070
 int id btnEdit 0x7f080071
 int id btnNext 0x7f080072
+int id btnOpenFile 0x7f080237
 int id btnPrev 0x7f080073
 int id btnSave 0x7f080074
 int id btnSaveAndAddItems 0x7f080075
@@ -4063,6 +4064,7 @@ int string error_icon_content_description 0x7f110055
 int string exposed_dropdown_menu_content_description 0x7f110056
 int string fab_transformation_scrim_behavior 0x7f110057
 int string fab_transformation_sheet_behavior 0x7f110058
+int string file_entry 0x7f1100f3
 int string google_account 0x7f110059
 int string google_setup 0x7f11005a
 int string google_setup_description 0x7f11005b
@@ -4178,9 +4180,11 @@ int string mtrl_timepicker_confirm 0x7f1100c8
 int string nav_app_bar_navigate_up_description 0x7f1100c9
 int string nav_app_bar_open_drawer_description 0x7f1100ca
 int string next 0x7f1100cb
+int string no_app_found_for_file 0x7f1100f4
 int string no_groups 0x7f1100cc
 int string no_pages 0x7f1100cd
 int string not_signed_in 0x7f1100ce
+int string open_file 0x7f1100f5
 int string page_counter 0x7f1100cf
 int string page_thumbnail 0x7f1100d0
 int string password_toggle_content_description 0x7f1100d1
@@ -4188,7 +4192,7 @@ int string path_password_eye 0x7f1100d2
 int string path_password_eye_mask_strike_through 0x7f1100d3
 int string path_password_eye_mask_visible 0x7f1100d4
 int string path_password_strike_through 0x7f1100d5
-int string pick_from_device 0x7f1100d6
+int string pick_file 0x7f1100f6
 int string prev 0x7f1100d7
 int string root_folder_id_hint 0x7f1100d8
 int string save 0x7f1100d9

@@ -3,6 +3,9 @@ package com.lifesaver.data.repository
 import android.net.Uri
 import com.lifesaver.auth.GoogleAuthManager
 import com.lifesaver.data.preferences.AppPreferences
+import com.lifesaver.data.remote.GmailAttachmentSummary
+import com.lifesaver.data.remote.GmailImportService
+import com.lifesaver.data.remote.GmailMessageSummary
 import com.lifesaver.data.remote.GoogleSheetsDriveService
 import com.lifesaver.model.DocumentGroup
 import com.lifesaver.model.DocumentPage
@@ -14,7 +17,8 @@ import kotlinx.coroutines.flow.map
 class DocumentRepository(
     private val authManager: GoogleAuthManager,
     private val preferences: AppPreferences,
-    private val remoteService: GoogleSheetsDriveService
+    private val remoteService: GoogleSheetsDriveService,
+    private val gmailService: GmailImportService
 ) {
 
     private val groupsState = MutableStateFlow<List<DocumentGroup>>(emptyList())
@@ -56,6 +60,8 @@ class DocumentRepository(
     fun currentSheetsId(): String = preferences.sheetsId.orEmpty()
 
     fun currentRootFolderId(): String = preferences.rootFolderId.orEmpty()
+
+    fun hasGmailAccess(): Boolean = authManager.hasGmailReadOnlyAccess()
 
     suspend fun refresh() {
         if (needsSetup()) {
@@ -114,6 +120,22 @@ class DocumentRepository(
 
     suspend fun addTextPage(groupId: String, textContent: String, caption: String?, sequence: Int? = null): DocumentPage {
         val page = remoteService.addTextPage(groupId, textContent, caption, sequence)
+        refresh()
+        return page
+    }
+
+    suspend fun listRecentGmailMessages(): List<GmailMessageSummary> {
+        return gmailService.listRecentMessagesWithAttachments()
+    }
+
+    suspend fun importGmailAttachment(
+        groupId: String,
+        attachment: GmailAttachmentSummary,
+        caption: String?,
+        sequence: Int? = null
+    ): DocumentPage {
+        val localUri = gmailService.downloadAttachmentToCache(attachment)
+        val page = remoteService.addPage(groupId, localUri, caption, sequence)
         refresh()
         return page
     }

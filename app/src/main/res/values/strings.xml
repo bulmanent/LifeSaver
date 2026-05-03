@@ -49,12 +49,18 @@
     <string name="pick_file">Pick file from device</string>
     <string name="capture_photo">Capture photo</string>
     <string name="add_text_entry">Add text entry</string>
+    <string name="import_from_gmail">Import attachment from Gmail</string>
     <string name="text_entry_hint">Enter text</string>
     <string name="image_entry">Image entry</string>
     <string name="file_entry">File entry</string>
     <string name="sequence_hint">Sequence</string>
     <string name="open_file">Open file</string>
     <string name="no_app_found_for_file">No app found to open this file type</string>
+    <string name="gmail_access_required">Grant Gmail read-only access to import attachments.</string>
+    <string name="select_email">Select email</string>
+    <string name="select_attachment">Select attachment</string>
+    <string name="no_gmail_messages_found">No recent emails with attachments were found.</string>
+    <string name="gmail_attachment_item">%1$s (%2$s)</string>
 
     <!-- Settings -->
     <string name="google_setup">Google Setup</string>

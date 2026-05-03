@@ -3313,6 +3313,7 @@ id bounceStart
 id btnAddTag
 id btnEdit
 id btnNext
+id btnOpenFile
 id btnPrev
 id btnSave
 id btnSaveAndAddItems
@@ -4064,6 +4065,7 @@ string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string file_entry
 string google_account
 string google_setup
 string google_setup_description
@@ -4179,9 +4181,11 @@ string mtrl_timepicker_confirm
 string nav_app_bar_navigate_up_description
 string nav_app_bar_open_drawer_description
 string next
+string no_app_found_for_file
 string no_groups
 string no_pages
 string not_signed_in
+string open_file
 string page_counter
 string page_thumbnail
 string password_toggle_content_description
@@ -4189,7 +4193,7 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
-string pick_from_device
+string pick_file
 string prev
 string root_folder_id_hint
 string save

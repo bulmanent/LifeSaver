@@ -3,6 +3,7 @@ package com.lifesaver.data.remote
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.http.ByteArrayContent
@@ -414,9 +415,8 @@ class GoogleSheetsDriveService(
     }
 
     private fun uploadDriveFile(folderId: String, groupTitle: String, sourceUri: Uri): DriveFileMetadata {
-        val fileBytes = appContext.contentResolver.openInputStream(sourceUri)?.use { it.readBytes() }
-            ?: error("Unable to read selected file")
-        val mimeType = appContext.contentResolver.getType(sourceUri) ?: DEFAULT_FILE_MIME_TYPE
+        val fileBytes = openUriBytes(sourceUri)
+        val mimeType = resolveMimeType(sourceUri)
         val originalName = queryDisplayName(sourceUri)
         val fileName = buildUploadFileName(groupTitle, originalName, mimeType)
 
@@ -451,6 +451,9 @@ class GoogleSheetsDriveService(
     }
 
     private fun queryDisplayName(uri: Uri): String? {
+        if (uri.scheme == "file") {
+            return uri.path?.let(::java.io.File)?.name
+        }
         appContext.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
             val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             if (index >= 0 && cursor.moveToFirst()) {
@@ -458,6 +461,28 @@ class GoogleSheetsDriveService(
             }
         }
         return null
+    }
+
+    private fun openUriBytes(uri: Uri): ByteArray {
+        if (uri.scheme == "file") {
+            val file = uri.path?.let(::java.io.File) ?: error("Unable to read selected file")
+            return file.readBytes()
+        }
+        return appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            ?: error("Unable to read selected file")
+    }
+
+    private fun resolveMimeType(uri: Uri): String {
+        if (uri.scheme == "file") {
+            val extension = uri.path
+                ?.substringAfterLast('.', "")
+                ?.lowercase()
+                ?.takeIf { it.isNotBlank() }
+            return extension
+                ?.let { MimeTypeMap.getSingleton().getMimeTypeFromExtension(it) }
+                ?: DEFAULT_FILE_MIME_TYPE
+        }
+        return appContext.contentResolver.getType(uri) ?: DEFAULT_FILE_MIME_TYPE
     }
 
     private fun requestFactory(): HttpRequestFactory {

@@ -32,6 +32,9 @@ public final class FragmentViewPageBinding implements ViewBinding {
   public final MaterialButton btnNext;
 
   @NonNull
+  public final MaterialButton btnOpenFile;
+
+  @NonNull
   public final MaterialButton btnPrev;
 
   @NonNull
@@ -48,13 +51,14 @@ public final class FragmentViewPageBinding implements ViewBinding {
 
   private FragmentViewPageBinding(@NonNull ConstraintLayout rootView,
       @NonNull LinearLayout bottomBar, @NonNull MaterialButton btnEdit,
-      @NonNull MaterialButton btnNext, @NonNull MaterialButton btnPrev,
-      @NonNull PhotoView photoView, @NonNull TextView tvCaption, @NonNull TextView tvPageCounter,
-      @NonNull TextView tvTextContent) {
+      @NonNull MaterialButton btnNext, @NonNull MaterialButton btnOpenFile,
+      @NonNull MaterialButton btnPrev, @NonNull PhotoView photoView, @NonNull TextView tvCaption,
+      @NonNull TextView tvPageCounter, @NonNull TextView tvTextContent) {
     this.rootView = rootView;
     this.bottomBar = bottomBar;
     this.btnEdit = btnEdit;
     this.btnNext = btnNext;
+    this.btnOpenFile = btnOpenFile;
     this.btnPrev = btnPrev;
     this.photoView = photoView;
     this.tvCaption = tvCaption;
@@ -107,6 +111,12 @@ public final class FragmentViewPageBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnOpenFile;
+      MaterialButton btnOpenFile = ViewBindings.findChildViewById(rootView, id);
+      if (btnOpenFile == null) {
+        break missingId;
+      }
+
       id = R.id.btnPrev;
       MaterialButton btnPrev = ViewBindings.findChildViewById(rootView, id);
       if (btnPrev == null) {
@@ -138,7 +148,7 @@ public final class FragmentViewPageBinding implements ViewBinding {
       }
 
       return new FragmentViewPageBinding((ConstraintLayout) rootView, bottomBar, btnEdit, btnNext,
-          btnPrev, photoView, tvCaption, tvPageCounter, tvTextContent);
+          btnOpenFile, btnPrev, photoView, tvCaption, tvPageCounter, tvTextContent);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

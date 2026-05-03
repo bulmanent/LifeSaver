@@ -36,6 +36,7 @@ id bottomBar
 id btnAddTag
 id btnEdit
 id btnNext
+id btnOpenFile
 id btnPrev
 id btnSave
 id btnSaveAndAddItems
@@ -105,6 +106,7 @@ string description_hint
 string document_image
 string edit
 string edit_group
+string file_entry
 string google_account
 string google_setup
 string google_setup_description
@@ -115,12 +117,14 @@ string group_detail
 string group_title_hint
 string image_entry
 string next
+string no_app_found_for_file
 string no_groups
 string no_pages
 string not_signed_in
+string open_file
 string page_counter
 string page_thumbnail
-string pick_from_device
+string pick_file
 string prev
 string root_folder_id_hint
 string save

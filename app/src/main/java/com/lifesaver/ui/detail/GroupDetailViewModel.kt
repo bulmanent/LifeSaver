@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.lifesaver.data.remote.GmailAttachmentSummary
+import com.lifesaver.data.remote.GmailMessageSummary
 import com.lifesaver.data.repository.DocumentRepository
 import com.lifesaver.model.DocumentGroup
 import com.lifesaver.model.DocumentPage
@@ -20,6 +22,9 @@ class GroupDetailViewModel(
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
+
+    private val _gmailMessages = MutableLiveData<List<GmailMessageSummary>?>()
+    val gmailMessages: LiveData<List<GmailMessageSummary>?> = _gmailMessages
 
     val group: LiveData<DocumentGroup?> =
         repository.allGroups
@@ -62,6 +67,27 @@ class GroupDetailViewModel(
             runCatching { repository.addTextPage(groupId, textContent, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to save text entry" }
         }
+    }
+
+    fun hasGmailAccess(): Boolean = repository.hasGmailAccess()
+
+    fun loadRecentGmailMessages() {
+        viewModelScope.launch {
+            runCatching { repository.listRecentGmailMessages() }
+                .onSuccess { _gmailMessages.value = it }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to load Gmail messages" }
+        }
+    }
+
+    fun importGmailAttachment(attachment: GmailAttachmentSummary, caption: String?, sequence: Int?) {
+        viewModelScope.launch {
+            runCatching { repository.importGmailAttachment(groupId, attachment, caption, sequence) }
+                .onFailure { _errorMessage.value = it.message ?: "Unable to import Gmail attachment" }
+        }
+    }
+
+    fun consumeGmailMessages() {
+        _gmailMessages.value = null
     }
 
     fun consumeError() {

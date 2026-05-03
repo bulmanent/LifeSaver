@@ -2087,10 +2087,11 @@
     <string name="exposed_dropdown_menu_content_description">Show dropdown menu</string>
     <string name="fab_transformation_scrim_behavior" translatable="false">com.google.android.material.transformation.FabTransformationScrimBehavior</string>
     <string name="fab_transformation_sheet_behavior" translatable="false">com.google.android.material.transformation.FabTransformationSheetBehavior</string>
+    <string name="file_entry">File entry</string>
     <string name="google_account">Connected Google account</string>
     <string name="google_setup">Google Setup</string>
     <string name="google_setup_description">Sign in with your Google account, then enter the shared Google Sheets ID and the root Google Drive folder ID for LifeSaver.</string>
-    <string name="google_setup_footer">LifeSaver reads Groups and Pages directly from Google Sheets and stores images directly in Google Drive. The sheet and folder must already exist and be shared with this Google account.</string>
+    <string name="google_setup_footer">LifeSaver reads Groups and Pages directly from Google Sheets and stores files directly in Google Drive. The sheet and folder must already exist and be shared with this Google account.</string>
     <string name="google_sign_in_failed">Google sign-in failed</string>
     <string name="google_sign_in_success">Google account connected</string>
     <string name="group_detail">Group Detail</string>
@@ -2208,9 +2209,11 @@
     <string name="nav_app_bar_navigate_up_description">Navigate up</string>
     <string name="nav_app_bar_open_drawer_description">Open navigation drawer</string>
     <string name="next">Next →</string>
+    <string name="no_app_found_for_file">No app found to open this file type</string>
     <string name="no_groups">No document groups yet.\nTap + to add one.</string>
     <string name="no_pages">No pages yet.\nTap + to add one.</string>
     <string name="not_signed_in">Not signed in</string>
+    <string name="open_file">Open file</string>
     <string name="page_counter">%1$d of %2$d</string>
     <string name="page_thumbnail">Page thumbnail</string>
     <string name="password_toggle_content_description">Show password</string>
@@ -2218,7 +2221,7 @@
     <string name="path_password_eye_mask_strike_through" translatable="false">M2,4.27 L19.73,22 L22.27,19.46 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z</string>
     <string name="path_password_eye_mask_visible" translatable="false">M2,4.27 L2,4.27 L4.54,1.73 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z</string>
     <string name="path_password_strike_through" translatable="false">M3.27,4.27 L19.74,20.74</string>
-    <string name="pick_from_device">Pick from device</string>
+    <string name="pick_file">Pick file from device</string>
     <string name="prev">← Prev</string>
     <string name="root_folder_id_hint">Root Drive folder ID</string>
     <string name="save">Save</string>

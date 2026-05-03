@@ -20,12 +20,21 @@ class GoogleAuthManager(context: Context) {
         Scope(DRIVE_FILE_SCOPE)
     )
 
+    private val gmailScope = Scope(GMAIL_READONLY_SCOPE)
+
     private val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .requestScopes(requestedScopes.first(), *requestedScopes.drop(1).toTypedArray())
         .build()
 
+    private val gmailSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .requestScopes(requestedScopes.first(), *requestedScopes.drop(1).toTypedArray(), gmailScope)
+        .build()
+
     fun signInIntent(): Intent = GoogleSignIn.getClient(appContext, signInOptions).signInIntent
+
+    fun gmailAccessSignInIntent(): Intent = GoogleSignIn.getClient(appContext, gmailSignInOptions).signInIntent
 
     fun handleSignInResult(data: Intent?): GoogleSignInAccount {
         return GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
@@ -49,6 +58,11 @@ class GoogleAuthManager(context: Context) {
         return GoogleSignIn.hasPermissions(account, *requestedScopes)
     }
 
+    fun hasGmailReadOnlyAccess(): Boolean {
+        val account = currentAccount() ?: return false
+        return GoogleSignIn.hasPermissions(account, gmailScope)
+    }
+
     fun signOut() {
         GoogleSignIn.getClient(appContext, signInOptions).signOut()
     }
@@ -60,10 +74,10 @@ class GoogleAuthManager(context: Context) {
             ?: throw IllegalStateException("Google account details unavailable")
     }
 
-    fun requireCredential(): GoogleAccountCredential {
+    fun requireCredential(scopes: List<String> = listOf(SPREADSHEETS_SCOPE, DRIVE_FILE_SCOPE)): GoogleAccountCredential {
         return GoogleAccountCredential.usingOAuth2(
             appContext,
-            listOf(SPREADSHEETS_SCOPE, DRIVE_FILE_SCOPE)
+            scopes
         ).apply {
             selectedAccountName = requireGoogleAccount().name
         }
@@ -72,5 +86,6 @@ class GoogleAuthManager(context: Context) {
     companion object {
         const val SPREADSHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets"
         const val DRIVE_FILE_SCOPE = "https://www.googleapis.com/auth/drive.file"
+        const val GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly"
     }
 }
