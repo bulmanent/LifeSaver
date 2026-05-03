@@ -31,35 +31,42 @@ class GmailImportService(
     suspend fun listRecentMessagesWithAttachments(limit: Int = 12): List<GmailMessageSummary> =
         withContext(Dispatchers.IO) {
             ensureReady()
-            val response = getJsonObject(
-                "$GMAIL_MESSAGES_URL?maxResults=$limit&q=has:attachment&fields=messages/id"
-            )
-            val messages = response.getAsJsonArray("messages") ?: JsonArray()
-            messages.mapNotNull { messageElement ->
-                val messageId = messageElement.asJsonObject.get("id")?.asString ?: return@mapNotNull null
-                getMessageSummary(messageId)
+            try {
+                val response = getJsonObject(
+                    "$GMAIL_MESSAGES_URL?maxResults=$limit&q=has:attachment&fields=messages/id"
+                )
+                val messages = response.getAsJsonArray("messages") ?: JsonArray()
+                messages.mapNotNull { messageElement ->
+                    val messageId = messageElement.asJsonObject.get("id")?.asString ?: return@mapNotNull null
+                    getMessageSummary(messageId)
+                }
+            } catch (e: HttpResponseException) {
+                throw IllegalStateException(explainHttpException(e), e)
             }
         }
 
     suspend fun downloadAttachmentToCache(attachment: GmailAttachmentSummary): Uri =
         withContext(Dispatchers.IO) {
             ensureReady()
-
-            val fileBytes = when {
-                !attachment.inlineData.isNullOrBlank() -> decodeBase64Url(attachment.inlineData)
-                !attachment.attachmentId.isNullOrBlank() -> {
-                    val response = getJsonObject(
-                        "$GMAIL_MESSAGES_URL/${attachment.messageId}/attachments/${attachment.attachmentId}"
-                    )
-                    decodeBase64Url(response.get("data")?.asString ?: error("Missing attachment data"))
+            try {
+                val fileBytes = when {
+                    !attachment.inlineData.isNullOrBlank() -> decodeBase64Url(attachment.inlineData)
+                    !attachment.attachmentId.isNullOrBlank() -> {
+                        val response = getJsonObject(
+                            "$GMAIL_MESSAGES_URL/${attachment.messageId}/attachments/${attachment.attachmentId}"
+                        )
+                        decodeBase64Url(response.get("data")?.asString ?: error("Missing attachment data"))
+                    }
+                    else -> error("Attachment data unavailable")
                 }
-                else -> error("Attachment data unavailable")
-            }
 
-            val cacheDir = File(appContext.cacheDir, "gmail_imports").apply { mkdirs() }
-            val file = File(cacheDir, sanitizeFileName(attachment.fileName))
-            file.writeBytes(fileBytes)
-            Uri.fromFile(file)
+                val cacheDir = File(appContext.cacheDir, "gmail_imports").apply { mkdirs() }
+                val file = File(cacheDir, sanitizeFileName(attachment.fileName))
+                file.writeBytes(fileBytes)
+                Uri.fromFile(file)
+            } catch (e: HttpResponseException) {
+                throw IllegalStateException(explainHttpException(e), e)
+            }
         }
 
     private fun getMessageSummary(messageId: String): GmailMessageSummary? {
@@ -160,6 +167,32 @@ class GmailImportService(
         val body = response.parseAsString()
         response.disconnect()
         return JsonParser.parseString(body).asJsonObject
+    }
+
+    private fun explainHttpException(error: HttpResponseException): String {
+        val details = runCatching {
+            val body = error.content ?: return@runCatching null
+            val root = JsonParser.parseString(body).asJsonObject
+            val errorObject = root.getAsJsonObject("error") ?: return@runCatching null
+            val message = errorObject.get("message")?.asString
+            val status = errorObject.get("status")?.asString
+            listOfNotNull(message, status).joinToString(" ")
+        }.getOrNull().orEmpty()
+
+        val message = if (details.isNotBlank()) details else error.statusMessage.orEmpty()
+
+        return when {
+            error.statusCode == 403 && message.contains("has not been used", ignoreCase = true) ->
+                "Gmail API is not enabled in the Google Cloud project."
+            error.statusCode == 403 && message.contains("accessNotConfigured", ignoreCase = true) ->
+                "Gmail API is not enabled in the Google Cloud project."
+            error.statusCode == 403 && message.contains("insufficient", ignoreCase = true) ->
+                "Gmail permission was granted, but the Gmail scope is not usable for this app configuration."
+            error.statusCode == 403 && message.isNotBlank() ->
+                "Gmail request failed: $message"
+            else ->
+                "Gmail request failed: HTTP ${error.statusCode}${if (message.isNotBlank()) " - $message" else ""}"
+        }
     }
 
     private fun <T> executeWithRetry(block: () -> T): T {
