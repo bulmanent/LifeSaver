@@ -16,6 +16,7 @@ import com.lifesaver.auth.GoogleAuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.net.URLEncoder
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
@@ -28,12 +29,15 @@ class GmailImportService(
     private val appContext = context.applicationContext
     private val transport = AndroidHttp.newCompatibleTransport()
 
-    suspend fun listRecentMessagesWithAttachments(limit: Int = 12): List<GmailMessageSummary> =
+    suspend fun searchMessagesWithAttachments(subjectTerm: String, limit: Int = 25): List<GmailMessageSummary> =
         withContext(Dispatchers.IO) {
             ensureReady()
             try {
+                val trimmedTerm = subjectTerm.trim()
+                require(trimmedTerm.isNotEmpty()) { "Enter a subject search term" }
+                val query = buildSearchQuery(trimmedTerm)
                 val response = getJsonObject(
-                    "$GMAIL_MESSAGES_URL?maxResults=$limit&q=has:attachment&fields=messages/id"
+                    "$GMAIL_MESSAGES_URL?maxResults=$limit&q=$query&fields=messages/id"
                 )
                 val messages = response.getAsJsonArray("messages") ?: JsonArray()
                 messages.mapNotNull { messageElement ->
@@ -140,6 +144,11 @@ class GmailImportService(
         return raw.trim()
             .replace(Regex("""[\\/:*?"<>|]"""), "_")
             .ifBlank { "gmail_attachment" }
+    }
+
+    private fun buildSearchQuery(subjectTerm: String): String {
+        val rawQuery = """has:attachment subject:"$subjectTerm""""
+        return URLEncoder.encode(rawQuery, Charsets.UTF_8.name())
     }
 
     private fun decodeBase64Url(data: String): ByteArray {

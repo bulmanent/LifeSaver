@@ -57,9 +57,12 @@
     <string name="open_file">Open file</string>
     <string name="no_app_found_for_file">No app found to open this file type</string>
     <string name="gmail_access_required">Grant Gmail read-only access to import attachments.</string>
+    <string name="gmail_subject_search_title">Search Gmail subject</string>
+    <string name="gmail_subject_search_hint">Enter part of the email subject</string>
+    <string name="gmail_subject_search_required">Enter a subject search term</string>
     <string name="select_email">Select email</string>
     <string name="select_attachment">Select attachment</string>
-    <string name="no_gmail_messages_found">No recent emails with attachments were found.</string>
+    <string name="no_gmail_messages_found">No attachment emails matched that subject search.</string>
     <string name="gmail_attachment_item">%1$s (%2$s)</string>
 
     <!-- Settings -->

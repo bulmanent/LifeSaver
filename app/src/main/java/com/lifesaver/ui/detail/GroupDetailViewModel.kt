@@ -71,9 +71,9 @@ class GroupDetailViewModel(
 
     fun hasGmailAccess(): Boolean = repository.hasGmailAccess()
 
-    fun loadRecentGmailMessages() {
+    fun loadGmailMessages(subjectTerm: String) {
         viewModelScope.launch {
-            runCatching { repository.listRecentGmailMessages() }
+            runCatching { repository.searchGmailMessages(subjectTerm) }
                 .onSuccess { _gmailMessages.value = it }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to load Gmail messages" }
         }

@@ -124,8 +124,8 @@ class DocumentRepository(
         return page
     }
 
-    suspend fun listRecentGmailMessages(): List<GmailMessageSummary> {
-        return gmailService.listRecentMessagesWithAttachments()
+    suspend fun searchGmailMessages(subjectTerm: String): List<GmailMessageSummary> {
+        return gmailService.searchMessagesWithAttachments(subjectTerm)
     }
 
     suspend fun importGmailAttachment(

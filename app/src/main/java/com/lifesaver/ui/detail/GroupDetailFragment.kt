@@ -68,7 +68,7 @@ class GroupDetailFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val app = requireActivity().application as LifeSaverApplication
             runCatching { app.authManager.handleSignInResult(result.data) }
-                .onSuccess { viewModel.loadRecentGmailMessages() }
+                .onSuccess { promptForGmailSearchTerm() }
                 .onFailure {
                     Toast.makeText(
                         requireContext(),
@@ -197,7 +197,28 @@ class GroupDetailFragment : Fragment() {
             gmailAccessLauncher.launch(app.authManager.gmailAccessSignInIntent())
             return
         }
-        viewModel.loadRecentGmailMessages()
+        promptForGmailSearchTerm()
+    }
+
+    private fun promptForGmailSearchTerm() {
+        val input = TextInputEditText(requireContext()).apply {
+            hint = getString(R.string.gmail_subject_search_hint)
+            setSingleLine()
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.gmail_subject_search_title)
+            .setView(buildSingleInputContainer(input))
+            .setPositiveButton(R.string.search) { _, _ ->
+                val subjectTerm = input.text?.toString()?.trim().orEmpty()
+                if (subjectTerm.isBlank()) {
+                    Toast.makeText(requireContext(), R.string.gmail_subject_search_required, Toast.LENGTH_LONG).show()
+                } else {
+                    viewModel.loadGmailMessages(subjectTerm)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun showCaptionDialog(uri: Uri) {
@@ -260,6 +281,14 @@ class GroupDetailFragment : Fragment() {
             setPadding(48, 24, 48, 0)
             addView(primaryInput)
             addView(sequenceLayout)
+        }
+    }
+
+    private fun buildSingleInputContainer(input: TextInputEditText): View {
+        return android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(48, 24, 48, 0)
+            addView(input)
         }
     }
 
