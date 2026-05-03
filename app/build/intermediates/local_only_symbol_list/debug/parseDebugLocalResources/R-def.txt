@@ -41,6 +41,7 @@ id btnPrev
 id btnSave
 id btnSaveAndAddItems
 id btnSaveConfig
+id btnShare
 id btnSignIn
 id btnSignOut
 id btnSyncNow
@@ -144,6 +145,7 @@ string select_email
 string sequence_hint
 string settings
 string setup_required_message
+string share_item
 string sheets_id_hint
 string sign_in_google
 string sign_out_google

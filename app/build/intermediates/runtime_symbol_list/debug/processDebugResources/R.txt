@@ -3317,6 +3317,7 @@ int id btnPrev 0x7f080073
 int id btnSave 0x7f080074
 int id btnSaveAndAddItems 0x7f080075
 int id btnSaveConfig 0x7f080076
+int id btnShare 0x7f080238
 int id btnSignIn 0x7f080077
 int id btnSignOut 0x7f080078
 int id btnSyncNow 0x7f080079
@@ -4216,6 +4217,7 @@ int string select_email 0x7f1100fc
 int string sequence_hint 0x7f1100e2
 int string settings 0x7f1100e3
 int string setup_required_message 0x7f1100e4
+int string share_item 0x7f110100
 int string sheets_id_hint 0x7f1100e5
 int string side_sheet_accessibility_pane_title 0x7f1100e6
 int string side_sheet_behavior 0x7f1100e7

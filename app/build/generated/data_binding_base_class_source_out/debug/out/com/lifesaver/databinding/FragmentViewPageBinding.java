@@ -38,6 +38,9 @@ public final class FragmentViewPageBinding implements ViewBinding {
   public final MaterialButton btnPrev;
 
   @NonNull
+  public final MaterialButton btnShare;
+
+  @NonNull
   public final PhotoView photoView;
 
   @NonNull
@@ -52,14 +55,16 @@ public final class FragmentViewPageBinding implements ViewBinding {
   private FragmentViewPageBinding(@NonNull ConstraintLayout rootView,
       @NonNull LinearLayout bottomBar, @NonNull MaterialButton btnEdit,
       @NonNull MaterialButton btnNext, @NonNull MaterialButton btnOpenFile,
-      @NonNull MaterialButton btnPrev, @NonNull PhotoView photoView, @NonNull TextView tvCaption,
-      @NonNull TextView tvPageCounter, @NonNull TextView tvTextContent) {
+      @NonNull MaterialButton btnPrev, @NonNull MaterialButton btnShare,
+      @NonNull PhotoView photoView, @NonNull TextView tvCaption, @NonNull TextView tvPageCounter,
+      @NonNull TextView tvTextContent) {
     this.rootView = rootView;
     this.bottomBar = bottomBar;
     this.btnEdit = btnEdit;
     this.btnNext = btnNext;
     this.btnOpenFile = btnOpenFile;
     this.btnPrev = btnPrev;
+    this.btnShare = btnShare;
     this.photoView = photoView;
     this.tvCaption = tvCaption;
     this.tvPageCounter = tvPageCounter;
@@ -123,6 +128,12 @@ public final class FragmentViewPageBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.btnShare;
+      MaterialButton btnShare = ViewBindings.findChildViewById(rootView, id);
+      if (btnShare == null) {
+        break missingId;
+      }
+
       id = R.id.photoView;
       PhotoView photoView = ViewBindings.findChildViewById(rootView, id);
       if (photoView == null) {
@@ -148,7 +159,7 @@ public final class FragmentViewPageBinding implements ViewBinding {
       }
 
       return new FragmentViewPageBinding((ConstraintLayout) rootView, bottomBar, btnEdit, btnNext,
-          btnOpenFile, btnPrev, photoView, tvCaption, tvPageCounter, tvTextContent);
+          btnOpenFile, btnPrev, btnShare, photoView, tvCaption, tvPageCounter, tvTextContent);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -3318,6 +3318,7 @@ id btnPrev
 id btnSave
 id btnSaveAndAddItems
 id btnSaveConfig
+id btnShare
 id btnSignIn
 id btnSignOut
 id btnSyncNow
@@ -4217,6 +4218,7 @@ string select_email
 string sequence_hint
 string settings
 string setup_required_message
+string share_item
 string sheets_id_hint
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
