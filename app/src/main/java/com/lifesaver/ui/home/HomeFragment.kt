@@ -38,6 +38,7 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var adapter: GroupAdapter
+    private var hasShownInitialLoadingMessage = false
     private val hideLoadingMessage = Runnable {
         val binding = _binding ?: return@Runnable
         if (adapter.currentList.isEmpty() && viewModel.isLoading.value != true && !viewModel.needsSetup()) {
@@ -70,12 +71,18 @@ class HomeFragment : Fragment() {
             binding.tvEmpty.text = getString(R.string.setup_required_message)
         } else {
             binding.fabAddGroup.show()
-            binding.recyclerGroups.visibility = if (adapter.currentList.isEmpty()) View.GONE else View.VISIBLE
-            binding.tvEmpty.text = getString(R.string.loading_groups)
-            binding.tvEmpty.visibility = View.VISIBLE
-            binding.tvEmpty.removeCallbacks(hideLoadingMessage)
+            val shouldShowInitialLoading = !hasShownInitialLoadingMessage && adapter.currentList.isEmpty()
+            binding.recyclerGroups.visibility = if (shouldShowInitialLoading) View.GONE else View.VISIBLE
+            if (shouldShowInitialLoading) {
+                binding.tvEmpty.text = getString(R.string.loading_groups)
+                binding.tvEmpty.visibility = View.VISIBLE
+                binding.tvEmpty.removeCallbacks(hideLoadingMessage)
+                binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
+                hasShownInitialLoadingMessage = true
+            } else {
+                binding.tvEmpty.visibility = View.GONE
+            }
             viewModel.refresh()
-            binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
         }
     }
 
@@ -161,12 +168,11 @@ class HomeFragment : Fragment() {
         viewModel.filteredGroups.observe(viewLifecycleOwner) { summaries ->
             adapter.submitList(summaries)
             val isLoading = viewModel.isLoading.value == true
-            binding.recyclerGroups.visibility = if (summaries.isEmpty() && isLoading) View.GONE else View.VISIBLE
-            binding.tvEmpty.visibility = if (summaries.isEmpty() && isLoading) View.VISIBLE else View.GONE
-            if (summaries.isEmpty()) {
-                if (isLoading) {
-                    binding.tvEmpty.text = getString(R.string.loading_groups)
-                }
+            val shouldShowLoading = !hasShownInitialLoadingMessage && summaries.isEmpty() && isLoading
+            binding.recyclerGroups.visibility = if (shouldShowLoading) View.GONE else View.VISIBLE
+            binding.tvEmpty.visibility = if (shouldShowLoading) View.VISIBLE else View.GONE
+            if (shouldShowLoading) {
+                binding.tvEmpty.text = getString(R.string.loading_groups)
             }
         }
     }
@@ -174,7 +180,7 @@ class HomeFragment : Fragment() {
     private fun observeLoading() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             val summaries = adapter.currentList
-            if (summaries.isEmpty()) {
+            if (summaries.isEmpty() && !hasShownInitialLoadingMessage) {
                 binding.recyclerGroups.visibility = if (isLoading) View.GONE else View.VISIBLE
                 if (isLoading) {
                     binding.tvEmpty.visibility = View.VISIBLE
@@ -184,6 +190,7 @@ class HomeFragment : Fragment() {
                 } else {
                     binding.tvEmpty.removeCallbacks(hideLoadingMessage)
                     binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
+                    hasShownInitialLoadingMessage = true
                 }
             }
         }
