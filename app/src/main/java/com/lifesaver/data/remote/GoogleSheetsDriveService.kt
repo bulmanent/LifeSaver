@@ -531,7 +531,8 @@ class GoogleSheetsDriveService(
 
     private fun patchJson(url: String, body: Any): JsonObject {
         val request = requestFactory()
-            .buildPatchRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
+            .buildPostRequest(GenericUrl(url), ByteArrayContent.fromString("application/json; charset=UTF-8", gson.toJson(body)))
+        request.headers["X-HTTP-Method-Override"] = "PATCH"
         val httpResponse = executeWithRetry { request.execute() }
         val response = httpResponse.parseAsString()
         httpResponse.disconnect()

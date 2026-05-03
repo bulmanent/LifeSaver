@@ -58,7 +58,7 @@
     <string name="group_title_hint">Group title (e.g. OT Report)</string>
     <string name="image_entry">Image entry</string>
     <string name="import_from_gmail">Import attachment from Gmail</string>
-    <string name="loading_groups">Please wait while I load data.\nIt might take a few seconds.</string>
+    <string name="loading_groups">Patience is a virtue.</string>
     <string name="loading_pages">Please wait while I load data.\nIt might take a few seconds.</string>
     <string name="next">Next →</string>
     <string name="no_app_found_for_file">No app found to open this file type</string>

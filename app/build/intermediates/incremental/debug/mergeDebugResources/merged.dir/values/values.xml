@@ -2107,7 +2107,7 @@
     <string name="image_entry">Image entry</string>
     <string name="import_from_gmail">Import attachment from Gmail</string>
     <string name="item_view_role_description">Tab</string>
-    <string name="loading_groups">Please wait while I load data.\nIt might take a few seconds.</string>
+    <string name="loading_groups">Patience is a virtue.</string>
     <string name="loading_pages">Please wait while I load data.\nIt might take a few seconds.</string>
     <string name="m3_exceed_max_badge_text_suffix" translatable="false"><ns2:g example="Some te" id="part of a long text">%1$s</ns2:g><ns2:g example="…" id="suffix">%2$s</ns2:g></string>
     <string name="m3_ref_typeface_brand_medium" translatable="false">sans-serif-medium</string>
