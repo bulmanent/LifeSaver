@@ -55,13 +55,15 @@
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddPage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/add_page"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="12dp"
+        android:contentDescription="@string/add_item"
+        android:text="@string/add_item"
+        app:icon="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

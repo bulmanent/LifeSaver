@@ -26,6 +26,10 @@ import com.lifesaver.model.GroupSummary
 
 class HomeFragment : Fragment() {
 
+    private companion object {
+        const val LOADING_MESSAGE_DURATION_MS = 2_000L
+    }
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -34,6 +38,12 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var adapter: GroupAdapter
+    private val hideLoadingMessage = Runnable {
+        val binding = _binding ?: return@Runnable
+        if (adapter.currentList.isEmpty() && viewModel.isLoading.value != true && !viewModel.needsSetup()) {
+            binding.tvEmpty.visibility = View.GONE
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -63,7 +73,9 @@ class HomeFragment : Fragment() {
             binding.recyclerGroups.visibility = if (adapter.currentList.isEmpty()) View.GONE else View.VISIBLE
             binding.tvEmpty.text = getString(R.string.loading_groups)
             binding.tvEmpty.visibility = View.VISIBLE
+            binding.tvEmpty.removeCallbacks(hideLoadingMessage)
             viewModel.refresh()
+            binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
         }
     }
 
@@ -150,12 +162,10 @@ class HomeFragment : Fragment() {
             adapter.submitList(summaries)
             val isLoading = viewModel.isLoading.value == true
             binding.recyclerGroups.visibility = if (summaries.isEmpty() && isLoading) View.GONE else View.VISIBLE
-            binding.tvEmpty.visibility = if (summaries.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvEmpty.visibility = if (summaries.isEmpty() && isLoading) View.VISIBLE else View.GONE
             if (summaries.isEmpty()) {
-                binding.tvEmpty.text = if (isLoading) {
-                    getString(R.string.loading_groups)
-                } else {
-                    getString(R.string.no_groups)
+                if (isLoading) {
+                    binding.tvEmpty.text = getString(R.string.loading_groups)
                 }
             }
         }
@@ -166,11 +176,14 @@ class HomeFragment : Fragment() {
             val summaries = adapter.currentList
             if (summaries.isEmpty()) {
                 binding.recyclerGroups.visibility = if (isLoading) View.GONE else View.VISIBLE
-                binding.tvEmpty.visibility = View.VISIBLE
-                binding.tvEmpty.text = if (isLoading) {
-                    getString(R.string.loading_groups)
+                if (isLoading) {
+                    binding.tvEmpty.visibility = View.VISIBLE
+                    binding.tvEmpty.text = getString(R.string.loading_groups)
+                    binding.tvEmpty.removeCallbacks(hideLoadingMessage)
+                    binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
                 } else {
-                    getString(R.string.no_groups)
+                    binding.tvEmpty.removeCallbacks(hideLoadingMessage)
+                    binding.tvEmpty.postDelayed(hideLoadingMessage, LOADING_MESSAGE_DURATION_MS)
                 }
             }
         }
@@ -195,6 +208,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.tvEmpty?.removeCallbacks(hideLoadingMessage)
         super.onDestroyView()
         _binding = null
     }

@@ -4006,6 +4006,7 @@ int string abc_toolbar_collapse_description 0x7f11001a
 int string add 0x7f11001b
 int string add_edit_group 0x7f11001c
 int string add_group 0x7f11001d
+int string add_item 0x7f110103
 int string add_page 0x7f11001e
 int string add_tag 0x7f11001f
 int string add_text_entry 0x7f110020

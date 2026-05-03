@@ -11,7 +11,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.lifesaver.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -22,7 +22,7 @@ public final class FragmentGroupDetailBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
-  public final FloatingActionButton fabAddPage;
+  public final ExtendedFloatingActionButton fabAddPage;
 
   @NonNull
   public final RecyclerView recyclerPages;
@@ -40,7 +40,7 @@ public final class FragmentGroupDetailBinding implements ViewBinding {
   public final TextView tvGroupTitle;
 
   private FragmentGroupDetailBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull FloatingActionButton fabAddPage, @NonNull RecyclerView recyclerPages,
+      @NonNull ExtendedFloatingActionButton fabAddPage, @NonNull RecyclerView recyclerPages,
       @NonNull TextView tvDescription, @NonNull TextView tvEmpty, @NonNull TextView tvGroupTags,
       @NonNull TextView tvGroupTitle) {
     this.rootView = rootView;
@@ -80,7 +80,7 @@ public final class FragmentGroupDetailBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.fabAddPage;
-      FloatingActionButton fabAddPage = ViewBindings.findChildViewById(rootView, id);
+      ExtendedFloatingActionButton fabAddPage = ViewBindings.findChildViewById(rootView, id);
       if (fabAddPage == null) {
         break missingId;
       }

@@ -4007,6 +4007,7 @@ string abc_toolbar_collapse_description
 string add
 string add_edit_group
 string add_group
+string add_item
 string add_page
 string add_tag
 string add_text_entry

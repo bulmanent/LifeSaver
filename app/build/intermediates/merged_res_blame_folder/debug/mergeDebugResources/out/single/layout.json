@@ -12,12 +12,12 @@
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_page.xml"
     },
     {
-        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_view_page.xml",
-        "source": "com.lifesaver.app-main-55:/layout/fragment_view_page.xml"
-    },
-    {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-mergeDebugResources-52:/layout/fragment_add_edit_group.xml",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/fragment_add_edit_group.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_group_detail.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_group_detail.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-mergeDebugResources-52:/layout/fragment_group_detail.xml",
@@ -34,5 +34,9 @@
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-mergeDebugResources-52:/layout/fragment_home.xml",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-mergeDebugResources-52:/layout/fragment_home.xml",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_home.xml"
     }
 ]

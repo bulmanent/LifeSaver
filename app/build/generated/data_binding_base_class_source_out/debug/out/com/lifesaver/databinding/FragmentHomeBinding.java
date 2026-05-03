@@ -11,7 +11,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.lifesaver.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -22,7 +22,7 @@ public final class FragmentHomeBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
-  public final FloatingActionButton fabAddGroup;
+  public final ExtendedFloatingActionButton fabAddGroup;
 
   @NonNull
   public final RecyclerView recyclerGroups;
@@ -31,7 +31,7 @@ public final class FragmentHomeBinding implements ViewBinding {
   public final TextView tvEmpty;
 
   private FragmentHomeBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull FloatingActionButton fabAddGroup, @NonNull RecyclerView recyclerGroups,
+      @NonNull ExtendedFloatingActionButton fabAddGroup, @NonNull RecyclerView recyclerGroups,
       @NonNull TextView tvEmpty) {
     this.rootView = rootView;
     this.fabAddGroup = fabAddGroup;
@@ -67,7 +67,7 @@ public final class FragmentHomeBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.fabAddGroup;
-      FloatingActionButton fabAddGroup = ViewBindings.findChildViewById(rootView, id);
+      ExtendedFloatingActionButton fabAddGroup = ViewBindings.findChildViewById(rootView, id);
       if (fabAddGroup == null) {
         break missingId;
       }

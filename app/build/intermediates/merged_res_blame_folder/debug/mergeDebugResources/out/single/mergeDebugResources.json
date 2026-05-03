@@ -20,16 +20,16 @@
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/navigation_nav_graph.xml.flat",
-        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/navigation/nav_graph.xml"
+        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_group.xml.flat",
+        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_group.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_page.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_page.xml"
     },
     {
-        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_item_document_group.xml.flat",
-        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/item_document_group.xml"
+        "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/navigation_nav_graph.xml.flat",
+        "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/navigation/nav_graph.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/mipmap-xxxhdpi_ic_launcher.png.flat",
@@ -48,12 +48,20 @@
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
+        "merged": "com.lifesaver.app-debug-53:/layout_fragment_group_detail.xml.flat",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_group_detail.xml"
+    },
+    {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/mipmap-xhdpi/ic_launcher.png"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.lifesaver.app-debug-53:/layout_fragment_home.xml.flat",
+        "source": "com.lifesaver.app-main-55:/layout/fragment_home.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_fragment_settings.xml.flat",
@@ -82,10 +90,6 @@
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/layout_fragment_view_page.xml.flat",
         "source": "/data/gradle/daemon/8.6/com.lifesaver.app-main-55:/layout/fragment_view_page.xml"
-    },
-    {
-        "merged": "com.lifesaver.app-debug-53:/layout_fragment_view_page.xml.flat",
-        "source": "com.lifesaver.app-main-55:/layout/fragment_view_page.xml"
     },
     {
         "merged": "/data/gradle/daemon/8.6/com.lifesaver.app-debug-53:/menu_menu_detail.xml.flat",
