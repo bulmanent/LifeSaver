@@ -90,6 +90,7 @@ class GroupDetailFragment : Fragment() {
         setupMenu()
         setupFab()
         observeData()
+        observeLoading()
         observeErrors()
         observeGmailMessages()
         viewModel.refresh()
@@ -316,7 +317,31 @@ class GroupDetailFragment : Fragment() {
 
         viewModel.pages.observe(viewLifecycleOwner) { pages ->
             adapter.submitList(pages)
+            val isLoading = viewModel.isLoading.value == true
+            binding.recyclerPages.visibility = if (pages.isEmpty() && isLoading) View.GONE else View.VISIBLE
             binding.tvEmpty.visibility = if (pages.isEmpty()) View.VISIBLE else View.GONE
+            if (pages.isEmpty()) {
+                binding.tvEmpty.text = if (isLoading) {
+                    getString(R.string.loading_pages)
+                } else {
+                    getString(R.string.no_pages)
+                }
+            }
+        }
+    }
+
+    private fun observeLoading() {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            val pages = adapter.currentList
+            if (pages.isEmpty()) {
+                binding.recyclerPages.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.tvEmpty.visibility = View.VISIBLE
+                binding.tvEmpty.text = if (isLoading) {
+                    getString(R.string.loading_pages)
+                } else {
+                    getString(R.string.no_pages)
+                }
+            }
         }
     }
 

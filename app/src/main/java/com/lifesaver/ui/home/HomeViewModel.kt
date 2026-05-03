@@ -17,9 +17,11 @@ class HomeViewModel(private val repository: DocumentRepository) : ViewModel() {
 
     private val _searchQuery = MutableLiveData("")
     private val _errorMessage = MutableLiveData<String?>()
+    private val _isLoading = MutableLiveData(false)
 
     val searchQuery: LiveData<String> = _searchQuery
     val errorMessage: LiveData<String?> = _errorMessage
+    val isLoading: LiveData<Boolean> = _isLoading
 
     val filteredGroups: LiveData<List<GroupSummary>> =
         repository.allGroupSummaries.asLiveData().switchMap { summaries ->
@@ -44,8 +46,10 @@ class HomeViewModel(private val repository: DocumentRepository) : ViewModel() {
 
     fun refresh() {
         viewModelScope.launch {
+            _isLoading.value = true
             runCatching { repository.refresh() }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to sync with Google Sheets" }
+            _isLoading.value = false
         }
     }
 

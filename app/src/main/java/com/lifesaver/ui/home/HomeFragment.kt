@@ -47,6 +47,7 @@ class HomeFragment : Fragment() {
         setupMenu()
         setupFab()
         observeGroups()
+        observeLoading()
         observeErrors()
     }
 
@@ -60,7 +61,8 @@ class HomeFragment : Fragment() {
         } else {
             binding.fabAddGroup.show()
             binding.recyclerGroups.visibility = View.VISIBLE
-            binding.tvEmpty.text = getString(R.string.no_groups)
+            binding.tvEmpty.text = getString(R.string.loading_groups)
+            binding.tvEmpty.visibility = View.VISIBLE
             viewModel.refresh()
         }
     }
@@ -146,7 +148,31 @@ class HomeFragment : Fragment() {
     private fun observeGroups() {
         viewModel.filteredGroups.observe(viewLifecycleOwner) { summaries ->
             adapter.submitList(summaries)
+            val isLoading = viewModel.isLoading.value == true
+            binding.recyclerGroups.visibility = if (summaries.isEmpty() && isLoading) View.GONE else View.VISIBLE
             binding.tvEmpty.visibility = if (summaries.isEmpty()) View.VISIBLE else View.GONE
+            if (summaries.isEmpty()) {
+                binding.tvEmpty.text = if (isLoading) {
+                    getString(R.string.loading_groups)
+                } else {
+                    getString(R.string.no_groups)
+                }
+            }
+        }
+    }
+
+    private fun observeLoading() {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            val summaries = adapter.currentList
+            if (summaries.isEmpty()) {
+                binding.recyclerGroups.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.tvEmpty.visibility = View.VISIBLE
+                binding.tvEmpty.text = if (isLoading) {
+                    getString(R.string.loading_groups)
+                } else {
+                    getString(R.string.no_groups)
+                }
+            }
         }
     }
 

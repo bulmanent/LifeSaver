@@ -21,7 +21,9 @@ class GroupDetailViewModel(
 ) : ViewModel() {
 
     private val _errorMessage = MutableLiveData<String?>()
+    private val _isLoading = MutableLiveData(false)
     val errorMessage: LiveData<String?> = _errorMessage
+    val isLoading: LiveData<Boolean> = _isLoading
 
     private val _gmailMessages = MutableLiveData<List<GmailMessageSummary>?>()
     val gmailMessages: LiveData<List<GmailMessageSummary>?> = _gmailMessages
@@ -36,8 +38,10 @@ class GroupDetailViewModel(
 
     fun refresh() {
         viewModelScope.launch {
+            _isLoading.value = true
             runCatching { repository.refresh() }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to refresh pages" }
+            _isLoading.value = false
         }
     }
 
@@ -57,15 +61,19 @@ class GroupDetailViewModel(
 
     fun addPage(uri: Uri, caption: String?, sequence: Int?) {
         viewModelScope.launch {
+            _isLoading.value = true
             runCatching { repository.addPage(groupId, uri, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to upload file" }
+            _isLoading.value = false
         }
     }
 
     fun addTextPage(textContent: String, caption: String?, sequence: Int?) {
         viewModelScope.launch {
+            _isLoading.value = true
             runCatching { repository.addTextPage(groupId, textContent, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to save text entry" }
+            _isLoading.value = false
         }
     }
 
@@ -81,8 +89,10 @@ class GroupDetailViewModel(
 
     fun importGmailAttachment(attachment: GmailAttachmentSummary, caption: String?, sequence: Int?) {
         viewModelScope.launch {
+            _isLoading.value = true
             runCatching { repository.importGmailAttachment(groupId, attachment, caption, sequence) }
                 .onFailure { _errorMessage.value = it.message ?: "Unable to import Gmail attachment" }
+            _isLoading.value = false
         }
     }
 
