@@ -123,6 +123,8 @@ string group_detail
 string group_title_hint
 string image_entry
 string import_from_gmail
+string loading_groups
+string loading_pages
 string next
 string no_app_found_for_file
 string no_gmail_messages_found

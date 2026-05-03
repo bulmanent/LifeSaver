@@ -4085,6 +4085,8 @@ string icon_content_description
 string image_entry
 string import_from_gmail
 string item_view_role_description
+string loading_groups
+string loading_pages
 string m3_exceed_max_badge_text_suffix
 string m3_ref_typeface_brand_medium
 string m3_ref_typeface_brand_regular

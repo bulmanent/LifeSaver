@@ -60,7 +60,7 @@ class HomeFragment : Fragment() {
             binding.tvEmpty.text = getString(R.string.setup_required_message)
         } else {
             binding.fabAddGroup.show()
-            binding.recyclerGroups.visibility = View.VISIBLE
+            binding.recyclerGroups.visibility = if (adapter.currentList.isEmpty()) View.GONE else View.VISIBLE
             binding.tvEmpty.text = getString(R.string.loading_groups)
             binding.tvEmpty.visibility = View.VISIBLE
             viewModel.refresh()

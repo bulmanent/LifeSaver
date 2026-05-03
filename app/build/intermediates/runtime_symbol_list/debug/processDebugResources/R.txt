@@ -4084,6 +4084,8 @@ int string icon_content_description 0x7f110062
 int string image_entry 0x7f110063
 int string import_from_gmail 0x7f1100f9
 int string item_view_role_description 0x7f110064
+int string loading_groups 0x7f110101
+int string loading_pages 0x7f110102
 int string m3_exceed_max_badge_text_suffix 0x7f110065
 int string m3_ref_typeface_brand_medium 0x7f110066
 int string m3_ref_typeface_brand_regular 0x7f110067
