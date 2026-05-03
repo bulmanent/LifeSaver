@@ -4065,6 +4065,8 @@ int string exposed_dropdown_menu_content_description 0x7f110056
 int string fab_transformation_scrim_behavior 0x7f110057
 int string fab_transformation_sheet_behavior 0x7f110058
 int string file_entry 0x7f1100f3
+int string gmail_access_required 0x7f1100f7
+int string gmail_attachment_item 0x7f1100f8
 int string google_account 0x7f110059
 int string google_setup 0x7f11005a
 int string google_setup_description 0x7f11005b
@@ -4076,6 +4078,7 @@ int string group_title_hint 0x7f110060
 int string hide_bottom_view_on_scroll_behavior 0x7f110061
 int string icon_content_description 0x7f110062
 int string image_entry 0x7f110063
+int string import_from_gmail 0x7f1100f9
 int string item_view_role_description 0x7f110064
 int string m3_exceed_max_badge_text_suffix 0x7f110065
 int string m3_ref_typeface_brand_medium 0x7f110066
@@ -4181,6 +4184,7 @@ int string nav_app_bar_navigate_up_description 0x7f1100c9
 int string nav_app_bar_open_drawer_description 0x7f1100ca
 int string next 0x7f1100cb
 int string no_app_found_for_file 0x7f1100f4
+int string no_gmail_messages_found 0x7f1100fa
 int string no_groups 0x7f1100cc
 int string no_pages 0x7f1100cd
 int string not_signed_in 0x7f1100ce
@@ -4204,6 +4208,8 @@ int string search_menu_title 0x7f1100de
 int string searchbar_scrolling_view_behavior 0x7f1100df
 int string searchview_clear_text_content_description 0x7f1100e0
 int string searchview_navigation_content_description 0x7f1100e1
+int string select_attachment 0x7f1100fb
+int string select_email 0x7f1100fc
 int string sequence_hint 0x7f1100e2
 int string settings 0x7f1100e3
 int string setup_required_message 0x7f1100e4

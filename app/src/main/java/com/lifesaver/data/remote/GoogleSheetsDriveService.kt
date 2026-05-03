@@ -23,6 +23,7 @@ import com.lifesaver.model.DocumentPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.InputStream
 import java.util.UUID
 
@@ -452,7 +453,7 @@ class GoogleSheetsDriveService(
 
     private fun queryDisplayName(uri: Uri): String? {
         if (uri.scheme == "file") {
-            return uri.path?.let(::java.io.File)?.name
+            return uri.path?.let { File(it).name }
         }
         appContext.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
             val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -465,7 +466,7 @@ class GoogleSheetsDriveService(
 
     private fun openUriBytes(uri: Uri): ByteArray {
         if (uri.scheme == "file") {
-            val file = uri.path?.let(::java.io.File) ?: error("Unable to read selected file")
+            val file = uri.path?.let { File(it) } ?: error("Unable to read selected file")
             return file.readBytes()
         }
         return appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }

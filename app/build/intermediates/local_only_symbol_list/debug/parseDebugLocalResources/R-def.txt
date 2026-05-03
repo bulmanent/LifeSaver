@@ -107,6 +107,8 @@ string document_image
 string edit
 string edit_group
 string file_entry
+string gmail_access_required
+string gmail_attachment_item
 string google_account
 string google_setup
 string google_setup_description
@@ -116,8 +118,10 @@ string google_sign_in_success
 string group_detail
 string group_title_hint
 string image_entry
+string import_from_gmail
 string next
 string no_app_found_for_file
+string no_gmail_messages_found
 string no_groups
 string no_pages
 string not_signed_in
@@ -132,6 +136,8 @@ string save_and_add_items
 string save_google_config
 string search
 string search_hint
+string select_attachment
+string select_email
 string sequence_hint
 string settings
 string setup_required_message

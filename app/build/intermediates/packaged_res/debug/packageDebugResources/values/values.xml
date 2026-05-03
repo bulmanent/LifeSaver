@@ -42,6 +42,8 @@
     <string name="edit">Edit</string>
     <string name="edit_group">Edit</string>
     <string name="file_entry">File entry</string>
+    <string name="gmail_access_required">Grant Gmail read-only access to import attachments.</string>
+    <string name="gmail_attachment_item">%1$s (%2$s)</string>
     <string name="google_account">Connected Google account</string>
     <string name="google_setup">Google Setup</string>
     <string name="google_setup_description">Sign in with your Google account, then enter the shared Google Sheets ID and the root Google Drive folder ID for LifeSaver.</string>
@@ -51,8 +53,10 @@
     <string name="group_detail">Group Detail</string>
     <string name="group_title_hint">Group title (e.g. OT Report)</string>
     <string name="image_entry">Image entry</string>
+    <string name="import_from_gmail">Import attachment from Gmail</string>
     <string name="next">Next →</string>
     <string name="no_app_found_for_file">No app found to open this file type</string>
+    <string name="no_gmail_messages_found">No recent emails with attachments were found.</string>
     <string name="no_groups">No document groups yet.\nTap + to add one.</string>
     <string name="no_pages">No pages yet.\nTap + to add one.</string>
     <string name="not_signed_in">Not signed in</string>
@@ -67,6 +71,8 @@
     <string name="save_google_config">Save configuration</string>
     <string name="search">Search</string>
     <string name="search_hint">Search by title or tag…</string>
+    <string name="select_attachment">Select attachment</string>
+    <string name="select_email">Select email</string>
     <string name="sequence_hint">Sequence</string>
     <string name="settings">Settings</string>
     <string name="setup_required_message">Complete Google setup first.\nYou will be redirected to Settings.</string>

@@ -4066,6 +4066,8 @@ string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
 string file_entry
+string gmail_access_required
+string gmail_attachment_item
 string google_account
 string google_setup
 string google_setup_description
@@ -4077,6 +4079,7 @@ string group_title_hint
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string image_entry
+string import_from_gmail
 string item_view_role_description
 string m3_exceed_max_badge_text_suffix
 string m3_ref_typeface_brand_medium
@@ -4182,6 +4185,7 @@ string nav_app_bar_navigate_up_description
 string nav_app_bar_open_drawer_description
 string next
 string no_app_found_for_file
+string no_gmail_messages_found
 string no_groups
 string no_pages
 string not_signed_in
@@ -4205,6 +4209,8 @@ string search_menu_title
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description
 string searchview_navigation_content_description
+string select_attachment
+string select_email
 string sequence_hint
 string settings
 string setup_required_message
