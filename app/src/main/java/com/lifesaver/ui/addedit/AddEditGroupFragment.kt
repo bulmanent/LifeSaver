@@ -45,6 +45,16 @@ class AddEditGroupFragment : Fragment() {
         setupSaveAndAddItemsButton()
         observeExistingGroup()
         observeErrors()
+        observeSaving()
+    }
+
+    private fun observeSaving() {
+        viewModel.saving.observe(viewLifecycleOwner) { saving ->
+            // Disable both save buttons while a save is in flight so a laggy
+            // Sheets write can't be triggered twice (no duplicate groups).
+            binding.btnSave.isEnabled = !saving
+            binding.btnSaveAndAddItems.isEnabled = !saving
+        }
     }
 
     private fun setupTagInput() {

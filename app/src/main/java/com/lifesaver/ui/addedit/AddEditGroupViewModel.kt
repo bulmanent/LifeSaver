@@ -19,14 +19,23 @@ class AddEditGroupViewModel(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    private val _saving = MutableLiveData(false)
+    val saving: LiveData<Boolean> = _saving
+
     val existingGroup: LiveData<DocumentGroup?> =
         repository.allGroups
             .map { groups -> groups.firstOrNull { it.id == groupId } }
             .asLiveData()
 
     fun saveGroup(title: String, tags: List<String>, description: String?, onDone: (DocumentGroup) -> Unit) {
+        // Guard against double-submission: while a save is in flight (Sheets
+        // can be slow), ignore further taps. Without this a second tap
+        // appends a duplicate/"ghost" group row. Set/checked on the main
+        // thread, so re-entrant clicks can't slip past.
+        if (_saving.value == true) return
+        _saving.value = true
         viewModelScope.launch {
-            runCatching {
+            try {
                 val existing = groupId?.let { repository.getGroupById(it) }
                 val saved = if (existing != null) {
                     val updated = existing.copy(title = title, tags = tags, description = description)
@@ -36,8 +45,10 @@ class AddEditGroupViewModel(
                     repository.addGroup(title, tags, description)
                 }
                 onDone(saved)
-            }.onFailure {
-                _errorMessage.value = it.message ?: "Unable to save group"
+            } catch (t: Throwable) {
+                _errorMessage.value = t.message ?: "Unable to save group"
+            } finally {
+                _saving.value = false
             }
         }
     }
